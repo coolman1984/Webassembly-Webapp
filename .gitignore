@@ -1,0 +1,33 @@
+# ---- Real, confidential business data - never committed ----
+# The 3 live source workbooks (real Samsung model codes, plant names, dates, quantities).
+/(DASH)*.xlsx
+/(DASH)*.xls
+/Final (SEEG)*.xlsb
+/Final (SEEG)*.xlsx
+/New Model*.xlsx
+/New Model*.xls
+# Any real workbook a maintainer drops in the inbox fallback folder (keep only its own readme).
+/inbox/*
+!/inbox/READ ME FIRST.txt
+# The preserved "original" backup still has real data baked into its embedded BOM_DATA/MASTER_DATA arrays -
+# it's a local dev-time safety net (used by verify.py), not something to publish. The live, git-tracked
+# BOM_Confirmation_Plan_SYSTEM_STATUS_FONT_MATCH.html has had its own embedded arrays emptied (it gets its
+# real data live from the local service - see server.py /api/data), so it is safe to commit as-is.
+/backup/
+# Everything the pipeline generates at runtime from the real files: the SQLite database, uploaded copies,
+# per-run staging, logs, the service's port/pid files - all derived from real data.
+/data/
+
+# ---- Regenerable build output ----
+# The bundled Python runtime (~45 MB of binaries) is rebuilt from tools/build_runtime.ps1; keeping it out of
+# git history keeps clones fast. See README.md "Further reading" / tools/build_runtime.ps1.
+/runtime/
+
+# ---- Standard Python / OS noise ----
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+.DS_Store
+Thumbs.db

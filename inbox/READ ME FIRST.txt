@@ -1,0 +1,8 @@
+INBOX - an alternative way to give the dashboard the 3 Excel files
+
+Put exactly the 3 Excel files (DASH status, SEEG SOP, New Model) in THIS folder, then open the dashboard,
+go to "Update Data" and click "Process & update dashboard" WITHOUT attaching any files.
+
+Use this if attaching files in the browser fails (for example when a company security tool blocks the browser
+from reading the files). The files stay here exactly as they are; the program only reads them.
+Files starting with ~$ and non-Excel files are ignored.
