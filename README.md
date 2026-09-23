@@ -9,6 +9,10 @@
 **You need:** Windows and desktop Microsoft Excel. **You do not need to install anything else** - Python and every
 library are inside the `runtime` folder. Copy the *whole* project folder to move it to another PC.
 
+The dashboard shows when the data was last refreshed, which 3 files it came from and any notes about the data
+(click the yellow *notes* badge). Click any table column header to sort (week columns sort by date); click again to
+reverse. CSV exports keep the sort order and open correctly in Excel.
+
 If something goes wrong the page says what (for example *"'X.xlsx' looks like the SEEG SOP file but is missing column(s): Cate"*).
 Your previous data always stays in place when a refresh is rejected. Technical details: `data\pipeline.log`.
 
@@ -38,7 +42,7 @@ Your previous data always stays in place when a refresh is rejected. Technical d
 | `pipeline\run.py` | orchestration, data-quality checks, CLI |
 | `server.py` | local service (127.0.0.1 only) |
 | `verify.py` | regression check against the original dashboard data |
-| `tests\` | edge-case, service, stress and browser tests |
+| `tests\` | edge-case, service, stress and browser tests (`test_portable`, `test_browser`, `test_served_page` also run in CI without Excel) |
 | `tools\build_runtime.ps1` | (maintainers) rebuilds `runtime\` from an existing Python install |
 | `backup\` | the untouched original dashboard |
 
@@ -69,13 +73,17 @@ Join key = model code (trimmed, upper-case, invisible characters removed, numeri
 runtime\python.exe -I tests\test_edge_cases.py -v   # 25 edge cases incl. fuzzed storage variants (real Excel)
 runtime\python.exe -I tests\test_service.py -v      # security, hostile uploads, concurrency, crash recovery, ports
 runtime\python.exe -I tests\test_stress.py -v       # 500k-row SOP, 60k models, Excel's 1,048,576-row limit
-python tests\test_browser.py                        # 300k-row page, hostile strings, CSV injection (needs Playwright)
+python tests\test_browser.py                        # 300k-row page, hostile strings, CSV injection, sorting (needs Playwright)
+python tests\test_served_page.py                    # served page: gzip, refresh notes, 150k-row database (needs Playwright)
+python -m unittest tests.test_portable -v           # rules, database, HTTP service - any OS, no Excel needed
 runtime\python.exe -I verify.py FILE FILE FILE      # equality with the original dashboard data
 ```
+`.github/workflows/tests.yml` runs the three Excel-free suites on every push. Set `PW_CHROMIUM` to use an already
+installed Chromium instead of Playwright's own download.
 
 ## Limits
 * Needs desktop Excel (COM). Without it the page says so and keeps the old data.
-* Static labels not driven by Excel (unchanged from the original): sidebar date, "Current planning week".
+* The sidebar date and "Current planning week" follow the PC's clock (ISO week).
 * The dashboard's table columns are fixed; a new Excel column is ignored unless the page is extended.
 
 ## Further reading

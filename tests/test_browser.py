@@ -43,7 +43,7 @@ GEN = """
 def main():
     served = sys.argv[1] if len(sys.argv) > 1 else None
     with sync_playwright() as p:
-        b = p.chromium.launch()
+        b = p.chromium.launch(executable_path=os.environ.get("PW_CHROMIUM") or None)   # optional: a pre-installed Chromium
         page = b.new_context(viewport={"width": 1500, "height": 950}, accept_downloads=True).new_page()
         errs = []
         page.on("pageerror", lambda e: errs.append(str(e)))
@@ -113,6 +113,41 @@ def main():
         page.select_option("#globalProject", "Project 4999")
         n = page.evaluate("document.getElementById('masterInfo').textContent")
         check("4. 5,000-project filter works", "of 1 models" in n, n)
+
+        # ---- 4b. usability: sorting, issue-filter chip, empty state, live planning week, Excel-friendly CSV --------
+        page.reload(); page.wait_for_timeout(400)
+        errs.clear()
+        check("4b-1. empty state is shown before any data", page.is_visible("#emptyState"))
+        wk = page.evaluate("document.getElementById('planningWeek').textContent")
+        exp = time.strftime("W%V / %G")
+        check("4b-2. planning week follows today's date", wk == exp, f"{wk} vs {exp}")
+        page.evaluate("""()=>{BOM_DATA=[
+            {model:'B',project:'P',mp:'W02 / 2027',firstAppearMpGap:'20 weeks',hqStatus:'LATER',localStatus:'MATCH'},
+            {model:'A',project:'P',mp:'W50 / 2026',firstAppearMpGap:'3 weeks',hqStatus:'MATCH',localStatus:'MATCH'},
+            {model:'C',project:'P',mp:'—',firstAppearMpGap:'—',hqStatus:'LATER',localStatus:'LATER'},
+            {model:'D',project:'P',mp:'W01 / 2026',firstAppearMpGap:'100 weeks',hqStatus:'N/A',localStatus:'N/A'}];
+            MASTER_DATA.splice(0,MASTER_DATA.length,...BOM_DATA);renderAll()}""")
+        check("4b-3. empty state hides once data exists", not page.is_visible("#emptyState"))
+        page.click("button[data-tab='bom']")
+        col = "() => [...document.querySelectorAll('#bomBody tr')].map(r => r.cells[0].textContent)"
+        page.click("#bomBody >> xpath=ancestor::table//th[9]")                 # 1st MP: chronological, blanks last
+        check("4b-4. week column sorts chronologically, blanks last", page.evaluate(col) == ["D", "A", "B", "C"], page.evaluate(col))
+        page.click("#bomBody >> xpath=ancestor::table//th[9]")
+        check("4b-5. second click sorts descending", page.evaluate(col) == ["B", "A", "D", "C"], page.evaluate(col))
+        page.click("#bomBody >> xpath=ancestor::table//th[8]")
+        check("4b-6. 'N weeks' column sorts numerically", page.evaluate(col) == ["A", "B", "D", "C"], page.evaluate(col))
+        page.click("button[data-tab='dashboard']"); page.click("#viewHqBtn")
+        chip = page.evaluate("[document.getElementById('bomFilterChip').classList.contains('show'), document.getElementById('bomFilterText').textContent]")
+        check("4b-7. drill-down shows which issue filter is active", chip == [True, "Only: HQ delay"] and page.evaluate(col) == ["B", "C"],
+              [chip, page.evaluate(col)])
+        page.click("#bomFilterClear")
+        check("4b-8. clearing the chip shows all BOM models again", len(page.evaluate(col)) == 4 and not page.is_visible("#bomFilterChip"))
+        with page.expect_download() as dl:
+            page.evaluate("document.getElementById('exportBom').click()")
+        raw = open(dl.value.path(), "rb").read()
+        check("4b-9. CSV starts with a UTF-8 BOM and follows the visible sort", raw.startswith(b"\xef\xbb\xbf") and
+              [l.split(",")[0] for l in raw.decode("utf-8-sig").splitlines()[1:]] == ['"A"', '"B"', '"D"', '"C"'])
+        check("4b-10. no JS errors in the usability features", not errs, errs[:2])
 
         # ---- 5. optional: a live service with a big database ------------------------------------------------
         if served:

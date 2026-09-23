@@ -1,0 +1,32 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    # Everything that does not need Windows + desktop Excel. The Excel-COM suites
+    # (test_edge_cases / test_service / test_stress) still run on a Windows PC with Excel.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile every module
+        run: python -m compileall -q pipeline server.py verify.py tests
+      - name: Business rules, database and service
+        run: python -m unittest tests.test_portable -v
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Dashboard page (large data, hostile strings, sorting, filters)
+        run: python tests/test_browser.py
+      - name: Served dashboard (gzip, refresh notes, very large database)
+        run: python tests/test_served_page.py -v

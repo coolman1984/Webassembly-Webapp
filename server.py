@@ -3,7 +3,7 @@
     runtime\\python.exe server.py        (start_dashboard.bat does this and opens the browser)
 
   GET  /                       the dashboard
-  GET  /api/data               current datasets (from memory; persisted in the local SQLite database)
+  GET  /api/data               current datasets (from memory, gzip when accepted; persisted in the local SQLite database)
   GET  /api/meta               {updated_at} - cheap change check
   GET  /api/status             pipeline job state (idle | running | done | error) + log + excel availability
   PUT  /api/upload/<1|2|3>     raw file body, X-Filename header  (one call per attached file)
@@ -14,6 +14,7 @@ state-changing calls also need the same-origin Origin and an X-Requested-With he
 """
 from __future__ import annotations
 
+import gzip
 import json
 import os
 import re
@@ -52,7 +53,7 @@ CSRF_HEADER = "bom-dashboard"
 PORT = BASE_PORT
 _lock = threading.Lock()
 _job = {"state": "idle", "log": [], "error": None, "started": None, "finished": None, "meta": None}
-_cache = {"body": None, "etag": None, "updated": None}
+_cache = {"body": None, "gz": None, "etag": None, "updated": None}
 
 
 def _log(msg: str) -> None:
@@ -72,12 +73,14 @@ def _load_cache() -> None:
     try:
         d = store.read_datasets(DB_PATH)
     except ValueError as e:
-        _cache.update(body=None, etag=None, updated=None)
+        _cache.update(body=None, gz=None, etag=None, updated=None)
         if os.path.isfile(DB_PATH):
             _log(f"Existing database ignored: {e}")
         return
     body = json.dumps(d, ensure_ascii=False, default=str).encode("utf-8")
-    _cache.update(body=body, etag='"%s"' % d["meta"].get("updated_at", ""), updated=d["meta"].get("updated_at"))
+    # Pre-compressed once per refresh: JSON of this shape shrinks ~10x, so big datasets reach the page much sooner.
+    _cache.update(body=body, gz=gzip.compress(body, 6), etag='"%s"' % d["meta"].get("updated_at", ""),
+                  updated=d["meta"].get("updated_at"))
 
 
 def _inbox_files() -> list[str]:
@@ -191,9 +194,12 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/data":
             if _cache["body"] is None:
                 return self._json(404, {"error": "No data has been loaded yet."})
+            hdr = {"ETag": _cache["etag"], "Vary": "Accept-Encoding"}
             if self.headers.get("If-None-Match") == _cache["etag"]:
-                return self._send(304, b"", "application/json", {"ETag": _cache["etag"]})
-            self._send(200, _cache["body"], "application/json; charset=utf-8", {"ETag": _cache["etag"]})
+                return self._send(304, b"", "application/json", hdr)
+            if "gzip" in (self.headers.get("Accept-Encoding") or "").lower():
+                return self._send(200, _cache["gz"], "application/json; charset=utf-8", hdr | {"Content-Encoding": "gzip"})
+            self._send(200, _cache["body"], "application/json; charset=utf-8", hdr)
         elif path == "/api/meta":
             self._json(200, {"updated_at": _cache["updated"]})
         elif path == "/api/status":

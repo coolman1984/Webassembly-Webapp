@@ -5,6 +5,7 @@ The service is started exactly as an end user gets it: the bundled runtime\\pyth
 """
 from __future__ import annotations
 
+import gzip
 import http.client
 import json
 import os
@@ -220,6 +221,10 @@ class TestRefreshFlow(SvcCase):
         st, h, body = srv.req("GET", "/api/data", raw=True)
         etag = {k.lower(): v for k, v in h.items()}["etag"]
         self.assertEqual(srv.req("GET", "/api/data", headers={"If-None-Match": etag}, raw=True)[0], 304)
+        # gzip for browsers that accept it; identical JSON once decompressed
+        st, h, gz = srv.req("GET", "/api/data", headers={"Accept-Encoding": "gzip, deflate"}, raw=True)
+        self.assertEqual({k.lower(): v for k, v in h.items()}.get("content-encoding"), "gzip")
+        self.assertEqual(gzip.decompress(gz), body)
         # uploads are cleaned up after processing
         time.sleep(0.5)
         self.assertFalse(os.path.isdir(os.path.join(srv.dir, "runs")) and os.listdir(os.path.join(srv.dir, "runs")))

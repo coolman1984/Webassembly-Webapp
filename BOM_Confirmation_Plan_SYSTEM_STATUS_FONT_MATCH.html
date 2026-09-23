@@ -242,19 +242,35 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
   font-variant-numeric:tabular-nums!important;
 }
 </style>
+
+<style id="usability-additions">
+.data-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:-4px 2px 12px;font-size:9.5px;color:#6f8396}
+.data-strip b{color:#294c68}.data-strip .notes-link{border:0;background:#fff4db;color:#8a5d0c;border-radius:999px;padding:3px 9px;font:inherit;font-weight:850;cursor:pointer}
+.empty-state{display:none;margin:0 0 12px;padding:14px 16px;border:1px dashed #b9cddb;border-radius:13px;background:#f6fafc;color:#35546e;font-size:11px;line-height:1.5}
+.empty-state.show{display:block}.empty-state button{margin-left:6px;border:1px solid #173f62;background:#173f62;color:#fff;border-radius:8px;padding:5px 10px;font:inherit;font-size:10px;font-weight:850;cursor:pointer}
+.filter-chip{display:none;align-items:center;gap:6px;margin-left:10px;padding:3px 4px 3px 9px;border-radius:999px;background:#fff4db;color:#8a5d0c;font-size:9px;font-weight:900;vertical-align:middle}
+.filter-chip.show{display:inline-flex}.filter-chip button{border:0;background:#f3dfae;color:#6d4906;border-radius:50%;width:17px;height:17px;line-height:17px;padding:0;font-size:11px;cursor:pointer}
+th.sortable{cursor:pointer;user-select:none}th.sortable:hover{color:#173f62;background:#e7eef4}
+th.sortable:after{content:" \2195";opacity:.35}th.sortable[aria-sort=ascending]:after{content:" \25B2";opacity:1}th.sortable[aria-sort=descending]:after{content:" \25BC";opacity:1}
+.data-info{margin-top:12px;border:1px solid #e1e9ef;border-radius:12px;background:#fff;padding:12px 14px;font-size:10px;color:#48637a;line-height:1.55}
+.data-info h4{margin:0 0 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#36536b}
+.data-info ul{margin:4px 0 0;padding-left:18px}.data-info li{margin:2px 0}.data-info .warn li{color:#8a5d0c}
+</style>
 </head>
 <body>
 <div class="app">
 <aside class="side">
   <div class="brand"><small>BOM CONTROL</small><h1>Confirmation<br>Plan</h1></div>
   <div class="nav"><button class="active" data-tab="dashboard">● <span>Dashboard</span></button><button data-tab="bom">▦ <span>BOM Plan</span></button><button data-tab="update">↑ <span>Update Data</span></button><button data-tab="master">☷ <span>All Models</span></button></div>
-  <div class="sidefoot">08 Sep 2026<br>Offline · self-contained</div>
+  <div class="sidefoot"><span id="todayLabel"></span><br>Offline · self-contained</div>
 </aside>
 <div class="main">
   <div class="topbar"><div class="filters"><div class="label">Global Filter</div><input id="globalSearch" placeholder="Search model / project / inch…"><select id="globalProject"><option value="">All Projects</option></select><button class="reset" id="resetBtn">Reset</button></div></div>
 
   <section class="slide active" id="dashboard"><div class="content">
     <div class="dash-top"><div class="dash-brand"><i></i>BOM Confirmation Control</div><div class="dash-meta">Status &amp; Issue Management</div></div>
+    <div class="data-strip" id="dataStrip"></div>
+    <div class="empty-state" id="emptyState">No data has been loaded yet. Attach the 3 Excel files on the Update Data page to fill the dashboard.<button type="button" id="emptyGoUpdate">Go to Update Data</button></div>
 
     <div class="v28-chartgrid">
       <section class="v28-chartcard">
@@ -287,9 +303,9 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
         <div class="panelhead"><div><div class="eyebrow">01 · Confirmation status</div><div class="paneltitle">Status</div><div class="panelsub">SEEG / LOCAL confirmation against the 12-week timing rule.</div></div><div class="badge" id="statusScope">371 models</div></div>
         <div class="panelbody">
           <div class="statgrid">
-            <div class="stat on"><div class="statlabel">Confirmation on time</div><div class="count"><b id="stOn">259</b><span>/ <span id="stOnTotal" class="status-total" class="status-total">371</span></span></div><div class="desc">Confirmation within the 12-week rule</div><div class="status-bar"><span id="stOnFill"></span></div></div>
-            <div class="stat prog"><div class="statlabel">In progress</div><div class="count"><b id="stProg">0</b><span>/ <span id="stProgTotal" class="status-total" class="status-total">371</span></span></div><div class="desc">Confirmation planned in current week</div><div class="status-bar"><span id="stProgFill"></span></div></div>
-            <div class="stat plan"><div class="statlabel">Planned</div><div class="count"><b id="stPlan">0</b><span>/ <span id="stPlanTotal" class="status-total" class="status-total">371</span></span></div><div class="desc">Confirmation planned after current week</div><div class="status-bar"><span id="stPlanFill"></span></div></div>
+            <div class="stat on"><div class="statlabel">Confirmation on time</div><div class="count"><b id="stOn">259</b><span>/ <span id="stOnTotal" class="status-total">371</span></span></div><div class="desc">Confirmation within the 12-week rule</div><div class="status-bar"><span id="stOnFill"></span></div></div>
+            <div class="stat prog"><div class="statlabel">In progress</div><div class="count"><b id="stProg">0</b><span>/ <span id="stProgTotal" class="status-total">371</span></span></div><div class="desc">Confirmation planned in current week</div><div class="status-bar"><span id="stProgFill"></span></div></div>
+            <div class="stat plan"><div class="statlabel">Planned</div><div class="count"><b id="stPlan">0</b><span>/ <span id="stPlanTotal" class="status-total">371</span></span></div><div class="desc">Confirmation planned after current week</div><div class="status-bar"><span id="stPlanFill"></span></div></div>
           </div>
           <div class="mix"><div class="mixhead"><span>Status mix</span><strong id="statusMix">259 / 371 models on time</strong></div><div class="track"><span id="statusOnFill" style="background:#1f8b73"></span><span id="statusProgFill" style="background:#1da6bb"></span><span id="statusPlanFill" style="background:#c79225"></span></div><div class="legend"><span><i class="dot" style="background:#1f8b73"></i>On time</span><span><i class="dot" style="background:#1da6bb"></i>In progress</span><span><i class="dot" style="background:#c79225"></i>Planned</span></div></div>
           <div class="foot"><div><div class="cap">On-time SEEG / LOCAL</div><div class="big" id="stCoverage">259 / 371</div></div><div style="text-align:right"><div class="cap">Rule</div><div class="big">≤ 12 weeks</div></div></div>
@@ -320,7 +336,7 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
         <h2>Update data</h2>
         <p>Attach new source files and refresh the same dashboard, BOM Plan and All Models format without rebuilding the presentation.</p>
       </div>
-      <div class="week"><span>Current planning week</span><b>W37 / 2026</b></div>
+      <div class="week"><span>Current planning week</span><b id="planningWeek"></b></div>
     </div>
 
     <div class="update-grid">
@@ -365,23 +381,42 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
     </div>
 
     <section class="system-help">
-      <div><b>Automatic processing</b><span>Reads XLSX / CSV / HTML / JSON locally in the browser and deduplicates model records.</span></div>
+      <div><b>Automatic processing</b><span>Excel on this computer reads the 3 workbooks (read-only, macros never run); nothing leaves this PC. Models are deduplicated automatically.</span></div>
       <div><b>Same formatting</b><span>Refreshes Dashboard, BOM Plan, All Models and all filters using the current presentation style.</span></div>
-      <div><b>Source mapping</b><span>Columns are matched by name, with flexible aliases for Model / Item / Project / Inch / BOM HQ / BOM LOCAL and SOP timing fields.</span></div>
+      <div><b>Any order, any file name</b><span>Each file is recognised by its column names, so the slot you use and the date in the file name do not matter. Moved or extra columns are fine.</span></div>
     </section>
+    <section class="data-info" id="dataInfo" hidden></section>
   </div>
 </section>
 
-<section class="slide" id="bom"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">BOM Confirmation Plan</div><div class="tablesub" id="bomSub">371 planned models</div></div><button id="exportBom" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>BOM HQ</th><th>BOM LOCAL</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>HQ Status</th><th>LOCAL Status</th></tr></thead><tbody id="bomBody"></tbody></table></div><div class="pager"><span class="small" id="bomInfo"></span><div><button id="bomPrev">‹</button><button id="bomNext">›</button></div></div></div></div></section>
+<section class="slide" id="bom"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">BOM Confirmation Plan</div><div class="tablesub"><span id="bomSub"></span><span class="filter-chip" id="bomFilterChip"><span id="bomFilterText"></span><button type="button" id="bomFilterClear" title="Show all BOM models" aria-label="Clear issue filter">×</button></span></div></div><button id="exportBom" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>BOM HQ</th><th>BOM LOCAL</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>HQ Status</th><th>LOCAL Status</th></tr></thead><tbody id="bomBody"></tbody></table></div><div class="pager"><span class="small" id="bomInfo"></span><div><button id="bomPrev">‹</button><button id="bomNext">›</button></div></div></div></div></section>
 
-  <section class="slide" id="master"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">All Models</div><div class="tablesub">Complete deduplicated model universe · 1,907 models</div></div><button id="exportMaster" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>Project Name</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>BOM HQ</th><th>BOM LOCAL</th><th>HQ Status</th><th>LOCAL Status</th><th>Coverage</th></tr></thead><tbody id="masterBody"></tbody></table></div><div class="pager"><span class="small" id="masterInfo"></span><div><button id="masterPrev">‹</button><button id="masterNext">›</button></div></div></div></div></section>
+  <section class="slide" id="master"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">All Models</div><div class="tablesub" id="masterSub">Complete deduplicated model universe</div></div><button id="exportMaster" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>Project Name</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>BOM HQ</th><th>BOM LOCAL</th><th>HQ Status</th><th>LOCAL Status</th><th>Coverage</th></tr></thead><tbody id="masterBody"></tbody></table></div><div class="pager"><span class="small" id="masterInfo"></span><div><button id="masterPrev">‹</button><button id="masterNext">›</button></div></div></div></div></section>
 </div></div>
 
 <script>
 let BOM_DATA=[];  // populated live by the local service (see server.py /api/data) - never a static real-data snapshot
 let MASTER_DATA=[];  // populated live by the local service (see server.py /api/data) - never a static real-data snapshot
-const CURRENT_YEAR=2026,CURRENT_WEEK=37,PAGE_SIZE=35;
-let state={tab:'dashboard',bomPage:1,masterPage:1,issueFilter:''};
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=t.getUTCFullYear();return {y,w:Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7)}}
+const TODAY=new Date(),NOW_WEEK=isoWeek(TODAY);
+const CURRENT_YEAR=NOW_WEEK.y,CURRENT_WEEK=NOW_WEEK.w,PAGE_SIZE=35;
+const BOM_KEYS=['model','project','inch','bomHQ','bomLocal','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','hqStatus','localStatus'];
+const MASTER_KEYS=['model','project','inch','projectName','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','bomHQ','bomLocal','hqStatus','localStatus','coverage'];
+const ISSUE_NAMES={sop:'SOP issue',hq:'HQ delay',seeg:'SEEG delay'};
+let state={tab:'dashboard',bomPage:1,masterPage:1,issueFilter:'',sort:{bom:null,master:null}};
+// Column sorting: week labels sort chronologically, "N weeks" and numbers numerically, blanks always last.
+function sortVal(v){if(v===null||v===undefined)return null;const s=String(v).trim();if(!s||s==='—'||s==='N/A')return null;const w=week(s);if(w)return idx(w);const g=gapNum(s);if(g!==null)return g;const n=s.match(/^(?:Version\s+)?(-?\d+(?:\.\d+)?)$/i);return n?+n[1]:s.toLowerCase()}
+function sortRows(rows,tab){const so=state.sort[tab];if(!so)return rows;const k=so.key,dir=so.dir;
+  const dec=rows.map((r,i)=>[sortVal(r[k]),i,r]);
+  dec.sort((a,b)=>{const x=a[0],y=b[0];if(x===null||y===null)return x===y?a[1]-b[1]:(x===null?1:-1);
+    if(typeof x===typeof y){if(x<y)return -dir;if(x>y)return dir;return a[1]-b[1]}return (typeof x==='number'?-1:1)*dir});
+  return dec.map(d=>d[2])}
+function setSort(tab,key){const cur=state.sort[tab];state.sort[tab]=cur&&cur.key===key?(cur.dir===1?{key,dir:-1}:null):{key,dir:1};
+  state[tab+'Page']=1;paintSortHeaders();tab==='bom'?renderBOM():renderMaster()}
+function paintSortHeaders(){[['bom','bomBody',BOM_KEYS],['master','masterBody',MASTER_KEYS]].forEach(([tab,body,keys])=>{
+  const ths=document.getElementById(body).closest('table').querySelectorAll('thead th');const so=state.sort[tab];
+  ths.forEach((th,i)=>{if(!keys[i])return;th.classList.add('sortable');th.dataset.key=keys[i];th.tabIndex=0;th.title='Sort by '+th.textContent;
+    if(so&&so.key===keys[i])th.setAttribute('aria-sort',so.dir===1?'ascending':'descending');else th.removeAttribute('aria-sort')})})}
 
 function week(s){const m=String(s||'').match(/W(\d{1,2})\s*\/\s*(\d{4})/i);return m?{w:+m[1],y:+m[2]}:null}
 function idx(w){return w?w.y*53+w.w:null}
@@ -432,6 +467,7 @@ function renderDashboard(){
     const e=document.getElementById(id);
     if(e)e.style.width=(base.length?((n/base.length)*100):0)+'%';
   };
+  const es=document.getElementById('emptyState');if(es)es.classList.toggle('show',!BOM_DATA.length&&!MASTER_DATA.length);
   sb('stOnFill',on);
   sb('stProgFill',prog);
   sb('stPlanFill',plan);
@@ -439,18 +475,19 @@ function renderDashboard(){
 } 
 
 function renderBOM(){
-  const rows=filteredBOM(),start=(state.bomPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
+  const rows=sortRows(filteredBOM(),'bom'),start=(state.bomPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
   document.getElementById('bomBody').innerHTML=vis.map(x=>'<tr><td>'+val(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td></tr>').join('');
-  const end=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('bomInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';document.getElementById('bomSub').textContent=rows.length+' models shown · BOM confirmation scope';
+  const end=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('bomInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';document.getElementById('bomSub').textContent=rows.length.toLocaleString()+' models shown · BOM confirmation scope';const chip=document.getElementById('bomFilterChip');chip.classList.toggle('show',!!state.issueFilter);document.getElementById('bomFilterText').textContent=state.issueFilter?'Only: '+ISSUE_NAMES[state.issueFilter]:'';
 }
 function renderMaster(){
-  const rows=filteredMaster(),start=(state.masterPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
+  const rows=sortRows(filteredMaster(),'master'),start=(state.masterPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
   document.getElementById('masterBody').innerHTML=vis.map(x=>'<tr><td>'+val(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.projectName)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td><td>'+val(x.coverage)+'</td></tr>').join('');
   const end=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('masterInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';
+  document.getElementById('masterSub').textContent='Complete deduplicated model universe · '+rows.length.toLocaleString()+' models';
 }
 function show(tab){state.tab=tab;document.querySelectorAll('.slide').forEach(s=>s.classList.toggle('active',s.id===tab));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));renderAll()}
 function renderAll(){renderDashboard();renderBOM();renderMaster()}
-function downloadCSV(rows,keys,name){if(!rows.length){alert('No data to export.');return}const csv=[keys.join(','),...rows.map(r=>keys.map(k=>'"'+String(r[k]??'').replace(/^([=+@\t\r])/,"'$1").replace(/"/g,'""')+'"').join(','))].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function downloadCSV(rows,keys,name){if(!rows.length){alert('No data to export.');return}const csv='\ufeff'+[keys.join(','),...rows.map(r=>keys.map(k=>'"'+String(r[k]??'').replace(/^([=+@\t\r])/,"'$1").replace(/"/g,'""')+'"').join(','))].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
 
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
 document.getElementById('globalSearch').addEventListener('input',()=>{state.bomPage=1;state.masterPage=1;renderAll()});
@@ -463,10 +500,18 @@ document.getElementById('masterNext').addEventListener('click',()=>{if(state.mas
 document.getElementById('viewSopBtn').addEventListener('click',()=>{state.issueFilter='sop';state.bomPage=1;show('bom')});
 document.getElementById('viewHqBtn').addEventListener('click',()=>{state.issueFilter='hq';state.bomPage=1;show('bom')});
 document.getElementById('viewSeegBtn').addEventListener('click',()=>{state.issueFilter='seeg';state.bomPage=1;show('bom')});
-document.getElementById('exportBom').addEventListener('click',()=>downloadCSV(filteredBOM(),['model','project','inch','bomHQ','bomLocal','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','hqStatus','localStatus'],'BOM_Confirmation_Plan.csv'));
-document.getElementById('exportMaster').addEventListener('click',()=>downloadCSV(filteredMaster(),['model','project','inch','projectName','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','bomHQ','bomLocal','hqStatus','localStatus','coverage'],'All_Models.csv'));
+document.getElementById('exportBom').addEventListener('click',()=>downloadCSV(sortRows(filteredBOM(),'bom'),BOM_KEYS,'BOM_Confirmation_Plan.csv'));
+document.getElementById('exportMaster').addEventListener('click',()=>downloadCSV(sortRows(filteredMaster(),'master'),MASTER_KEYS,'All_Models.csv'));
 
 [...new Set(MASTER_DATA.map(x=>x.project).filter(Boolean))].sort().forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;document.getElementById('globalProject').appendChild(o)});
+document.querySelectorAll('thead').forEach(h=>{const tab=h.closest('table').querySelector('#bomBody')?'bom':'master';
+  h.addEventListener('click',e=>{const th=e.target.closest('th[data-key]');if(th)setSort(tab,th.dataset.key)});
+  h.addEventListener('keydown',e=>{const th=e.target.closest('th[data-key]');if(th&&(e.key==='Enter'||e.key===' ')){e.preventDefault();setSort(tab,th.dataset.key)}})});
+document.getElementById('bomFilterClear').addEventListener('click',()=>{state.issueFilter='';state.bomPage=1;renderBOM()});
+document.getElementById('emptyGoUpdate').addEventListener('click',()=>show('update'));
+document.getElementById('todayLabel').textContent=TODAY.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+document.getElementById('planningWeek').textContent='W'+String(CURRENT_WEEK).padStart(2,'0')+' / '+CURRENT_YEAR;
+paintSortHeaders();
 renderAll();
 </script>
 
@@ -491,7 +536,7 @@ renderAll();
   function applyData(d){
     if(!d||!Array.isArray(d.bom)||!Array.isArray(d.master))throw new Error('the service returned data in an unexpected format');
     BOM_DATA=d.bom;
-    MASTER_DATA.splice(0,MASTER_DATA.length,...d.master);
+    MASTER_DATA.length=0;for(const r of d.master)MASTER_DATA.push(r);   // no spread: >~120k arguments overflow the call stack
     const sel=$('globalProject'),keep=sel.value;
     while(sel.options.length>1)sel.remove(1);
     [...new Set(MASTER_DATA.map(x=>x.project).filter(Boolean))].sort().forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o)});
@@ -499,6 +544,20 @@ renderAll();
     state.issueFilter='';state.bomPage=1;state.masterPage=1;
     lastUpdated=(d.meta&&d.meta.updated_at)||lastUpdated;
     renderAll();
+    showMeta(d.meta||{});
+  }
+  const ROLE_NAMES={DASH:'Model source (DASH)',SEEG:'SOP source (SEEG)',NEWMODEL:'BOM source (New Model)'};
+  const fmtWhen=t=>{if(!t)return 'unknown';const d=new Date(t);return isNaN(d)?String(t).replace('T',' '):d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})};
+  function showMeta(m){
+    const w=m.warnings||[],files=m.files||[],E=v=>esc(v);
+    $('dataStrip').innerHTML='<span>Data refreshed <b>'+E(fmtWhen(m.updated_at))+'</b></span>'
+      +(files.length?'<span>'+files.length+' source files</span>':'')
+      +(w.length?'<button type="button" class="notes-link" id="notesLink">'+w.length+' note'+(w.length>1?'s':'')+' from the last refresh</button>':'<span>No data notes</span>');
+    const nl=$('notesLink');if(nl)nl.addEventListener('click',()=>show('update'));
+    const info=$('dataInfo');info.hidden=false;
+    info.innerHTML='<h4>Data currently shown</h4>Refreshed '+E(fmtWhen(m.updated_at))
+      +(files.length?'<ul>'+files.map(f=>'<li><b>'+E(ROLE_NAMES[f.role]||f.role)+'</b>: '+E(f.name)+(f.sheet?' · sheet “'+E(f.sheet)+'”':'')+'</li>').join('')+'</ul>':'')
+      +(w.length?'<h4 style="margin-top:10px">Notes from the last refresh</h4><ul class="warn">'+w.map(x=>'<li>'+E(x)+'</li>').join('')+'</ul>':'');
   }
   async function updateSystem(){
     if(busy)return;
