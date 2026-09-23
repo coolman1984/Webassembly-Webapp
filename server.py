@@ -8,6 +8,12 @@
   GET  /api/status             pipeline job state (idle | running | done | error) + log + excel availability
   PUT  /api/upload/<1|2|3>     raw file body, X-Filename header  (one call per attached file)
   POST /api/process            validate + extract (Excel COM) + rebuild database
+  GET  /api/history            every stored refresh (snapshot) with its KPIs - see pipeline/history.py
+  GET  /api/history/<id>       one snapshot's complete datasets (to look at an earlier week)
+  GET  /api/changes[?from=&to=] BOM models added / removed / changed between two snapshots (default: last two)
+  GET  /api/model?code=<model> one model's dates and statuses across all snapshots
+  POST /api/history/<id>/restore   make that snapshot the current data again
+  POST /api/history/<id>/delete    remove a snapshot (e.g. a refresh made with wrong files)
 
 Security: bound to loopback; every request must carry a loopback Host header (DNS-rebinding defence);
 state-changing calls also need the same-origin Origin and an X-Requested-With header.
@@ -31,6 +37,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 from pipeline import excel_com as X          # noqa: E402
+from pipeline import history as H            # noqa: E402
 from pipeline import run as P                # noqa: E402
 from pipeline import sources as S            # noqa: E402
 from pipeline import store                   # noqa: E402
@@ -81,6 +88,24 @@ def _load_cache() -> None:
     # Pre-compressed once per refresh: JSON of this shape shrinks ~10x, so big datasets reach the page much sooner.
     _cache.update(body=body, gz=gzip.compress(body, 6), etag='"%s"' % d["meta"].get("updated_at", ""),
                   updated=d["meta"].get("updated_at"))
+
+
+def _hist() -> str:
+    return P.history_path(DB_PATH)
+
+
+def _seed_history() -> None:
+    """First start with history support: keep the data already on this PC as the first snapshot."""
+    try:
+        if _cache["body"] is None or H.latest(_hist()):
+            return
+        d = store.read_datasets(DB_PATH)
+        files = store.read_source_files(DB_PATH) or d["meta"].get("files", [])
+        sop = (d["meta"].get("report") or {}).get("sop_versions") or [None, None]
+        if H.record(_hist(), d["meta"], d["bom"], d["master"], files, sop[-1]):
+            _log("History started with the data already on this computer.")
+    except Exception as e:
+        _log(f"History could not be started from the existing data: {e}")
 
 
 def _inbox_files() -> list[str]:
@@ -141,7 +166,11 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _json(self, code: int, obj) -> None:
-        self._send(code, json.dumps(obj, ensure_ascii=False, default=str).encode("utf-8"), "application/json; charset=utf-8")
+        body = json.dumps(obj, ensure_ascii=False, default=str).encode("utf-8")
+        if len(body) > 64_000 and "gzip" in (self.headers.get("Accept-Encoding") or "").lower():
+            return self._send(code, gzip.compress(body, 6), "application/json; charset=utf-8",
+                              {"Content-Encoding": "gzip", "Vary": "Accept-Encoding"})
+        self._send(code, body, "application/json; charset=utf-8")
 
     def _host_ok(self) -> bool:
         return (self.headers.get("Host") or "").lower() in (f"{HOST}:{PORT}", f"localhost:{PORT}")
@@ -200,6 +229,18 @@ class Handler(BaseHTTPRequestHandler):
             if "gzip" in (self.headers.get("Accept-Encoding") or "").lower():
                 return self._send(200, _cache["gz"], "application/json; charset=utf-8", hdr | {"Content-Encoding": "gzip"})
             self._send(200, _cache["body"], "application/json; charset=utf-8", hdr)
+        elif path == "/api/history":
+            self._json(200, {"snapshots": H.list_snapshots(_hist())})
+        elif m := re.fullmatch(r"/api/history/(\d{1,9})", path):
+            d = H.load(_hist(), int(m.group(1)))
+            self._json(200, d) if d else self._json(404, {"error": "No such snapshot."})
+        elif path == "/api/changes":
+            q = parse_qs(urlparse(self.path).query)
+            num = lambda k: int(q[k][0]) if q.get(k) and q[k][0].isdigit() else None
+            self._json(200, H.changes(_hist(), num("from"), num("to")))
+        elif path == "/api/model":
+            code = (parse_qs(urlparse(self.path).query).get("code") or [""])[0][:200]
+            self._json(200, {"model": code, "history": H.model_history(_hist(), code) if code else []})
         elif path == "/api/meta":
             self._json(200, {"updated_at": _cache["updated"]})
         elif path == "/api/status":
@@ -256,6 +297,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self._guard(True):
             return
         u = urlparse(self.path)
+        if m := re.fullmatch(r"/api/history/(\d{1,9})/(restore|delete)", u.path):
+            return self._snapshot_action(int(m.group(1)), m.group(2))
         if u.path != "/api/process":
             return self._json(404, {"error": "not found"})
         if not X.excel_installed():
@@ -267,7 +310,9 @@ class Handler(BaseHTTPRequestHandler):
             if from_inbox:
                 staged, run_dir = _inbox_files(), None          # read in place; the user's files are never moved
                 if len(staged) != 3:
-                    return self._json(400, {"error": f"The inbox folder must contain exactly 3 Excel files (found {len(staged)})."})
+                    hint = (" Move last week's files into a sub-folder (for example inbox\\old) - files in sub-folders are ignored."
+                            if len(staged) > 3 else "")
+                    return self._json(400, {"error": f"The inbox folder must contain exactly 3 Excel files (found {len(staged)}).{hint}"})
             else:
                 paths = _staged_uploads()
                 if len(paths) != 3:
@@ -284,6 +329,24 @@ class Handler(BaseHTTPRequestHandler):
             _job.update(state="running", log=[], error=None, started=time.time(), finished=None)
         threading.Thread(target=_run_job, args=(staged, run_dir), daemon=True).start()
         self._json(202, {"state": "running"})
+
+
+    def _snapshot_action(self, sid: int, action: str) -> None:
+        with _lock:
+            if _job["state"] == "running":
+                return self._json(409, {"error": "A refresh is running - try again when it has finished."})
+            if action == "delete":
+                if not H.delete(_hist(), sid):
+                    return self._json(404, {"error": "No such snapshot."})
+                _log(f"History: snapshot {sid} deleted.")
+                return self._json(200, {"deleted": sid})
+            d = H.load(_hist(), sid)
+            if not d:
+                return self._json(404, {"error": "No such snapshot."})
+            meta = store.write_restored(DB_PATH, d["bom"], d["master"], d["meta"])
+            _load_cache()
+            _log(f"History: the data of {d['meta']['updated_at']} (snapshot {sid}) is current again.")
+            self._json(200, {"restored": sid, "updated_at": meta["updated_at"]})
 
 
 def _ping(port: int) -> bool:
@@ -343,6 +406,7 @@ def main() -> int:
     shutil.rmtree(UPLOAD_DIR, ignore_errors=True)
     shutil.rmtree(RUN_DIR, ignore_errors=True)
     _load_cache()
+    _seed_history()
     with open(os.path.join(DATA_DIR, "port.txt"), "w") as f:
         f.write(str(PORT))
     url = f"http://{HOST}:{PORT}/"

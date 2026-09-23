@@ -6,3 +6,7 @@ go to "Update Data" and click "Process & update dashboard" WITHOUT attaching any
 Use this if attaching files in the browser fails (for example when a company security tool blocks the browser
 from reading the files). The files stay here exactly as they are; the program only reads them.
 Files starting with ~$ and non-Excel files are ignored.
+
+EVERY WEEK: move last week's 3 files into a sub-folder (for example "old") and put the 3 new ones here.
+Files inside sub-folders are ignored. Every refresh is also kept in the dashboard's History page, so old
+data is never lost even if you delete the old Excel files.

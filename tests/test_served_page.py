@@ -18,6 +18,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from tests import test_portable as TP            # noqa: E402  (installs the COM stubs when pywin32 is absent)
 import server                                     # noqa: E402
+from pipeline import history as H                # noqa: E402
+from pipeline import run as R                    # noqa: E402
 from pipeline import store                        # noqa: E402
 from playwright.sync_api import sync_playwright   # noqa: E402
 
@@ -72,6 +74,59 @@ class TestServedPage(unittest.TestCase):
         self.assertIn("d.xlsx", info)
         self.assertIn("note one", info)
         self.assertFalse(page.is_visible("#emptyState"))
+        self.assertEqual(errs, [])
+
+    def test_weekly_history_screens(self):
+        hist = R.history_path(server.DB_PATH)
+        if os.path.exists(hist):
+            os.remove(hist)
+        weeks = [("w1", "2025-12-29", None, "2026-01-05T09:00:00"), ("w2", "2026-01-12", "C", "2026-01-12T09:00:00")]
+        for tag, local, extra, when in weeks:
+            ext = TP.week_ext(tag, local, extra_model=extra)
+            bom, master, report = R.build_datasets(ext)
+            with TP.mock.patch.object(store, "_now", return_value=when):
+                meta = store.write_db(server.DB_PATH, ext, bom, master, report)
+            H.record(hist, meta, bom, master, ext["files"], report["sop_versions"][1])
+        server._load_cache()
+        page = self.browser.new_page(viewport={"width": 1400, "height": 900})
+        self.addCleanup(page.close)
+        errs = []
+        page.on("pageerror", lambda e: errs.append(str(e)))
+        page.on("dialog", lambda d: d.accept())
+        page.goto(self.url)
+        page.wait_for_function("document.querySelectorAll('#snapBody tr').length === 2")
+        # dashboard: change since the previous refresh (on time 1 -> 0, SEEG delay 1 -> 2)
+        page.wait_for_function("document.getElementById('dOn').textContent !== ''")
+        self.assertEqual(page.inner_text("#dOn"), "▼ 1 since 5 Jan")
+        self.assertIn("bad", page.get_attribute("#dOn", "class"))
+        self.assertEqual(page.inner_text("#dSeeg"), "▲ 1 since 5 Jan")
+        page.click("button[data-tab='history']")
+        self.assertEqual(page.locator("#trendWrap polyline").count(), 4)
+        page.wait_for_function("document.querySelectorAll('#chgChips button').length === 6")
+        chips = page.inner_text("#chgChips")
+        self.assertIn("New models 1", chips)
+        self.assertIn("Moved later 1", chips)
+        page.click("#chgChips button[data-k='later']")
+        self.assertIn("+2 w", page.inner_text("#chgBody"))
+        # per-model timeline
+        page.click("#chgBody .mlink")
+        page.wait_for_function("document.querySelectorAll('#drawerTl tr').length === 2")
+        self.assertEqual(page.locator("#drawerTl td.changed").count() >= 1, True)
+        self.assertIn("+2w", page.inner_text("#drawerTl"))
+        page.keyboard.press("Escape")
+        self.assertFalse(page.is_visible("#modelDrawer"))
+        # look at the older week, then go back
+        page.click("#snapBody tr:nth-child(2) button[data-act='view']")
+        page.wait_for_function("!document.getElementById('viewingBanner').hidden")
+        self.assertEqual(page.evaluate("BOM_DATA.length"), 2)
+        self.assertIn("5 Jan 2026", page.inner_text("#viewingText"))
+        page.click("#backToCurrent")
+        page.wait_for_function("document.getElementById('viewingBanner').hidden && BOM_DATA.length === 3")
+        # make the older week current again (e.g. wrong files were used)
+        page.click("button[data-tab='history']")
+        page.click("#snapBody tr:nth-child(2) button[data-act='restore']")
+        page.wait_for_function("BOM_DATA.length === 2")
+        self.assertEqual(store.read_datasets(server.DB_PATH)["meta"]["restored_from"]["taken_at"], "2026-01-05T09:00:00")
         self.assertEqual(errs, [])
 
     def test_very_large_database_loads(self):

@@ -5,6 +5,8 @@
 2. Open the **Update Data** tab, attach the 3 Excel files (any order), click **Process & update dashboard**.
    It takes about 40 seconds. Every number, chart, table and the project filter refresh.
 3. Next time, just start it again - the last data is remembered.
+4. **Every week:** attach the 3 new files and process again. Every refresh is kept in the **History** page, so earlier
+   weeks are never lost (see *Weekly history* below).
 
 **You need:** Windows and desktop Microsoft Excel. **You do not need to install anything else** - Python and every
 library are inside the `runtime` folder. Copy the *whole* project folder to move it to another PC.
@@ -15,6 +17,25 @@ reverse. CSV exports keep the sort order and open correctly in Excel.
 
 If something goes wrong the page says what (for example *"'X.xlsx' looks like the SEEG SOP file but is missing column(s): Cate"*).
 Your previous data always stays in place when a refresh is rejected. Technical details: `data\pipeline.log`.
+
+## Weekly history
+Every successful refresh is stored as a snapshot in `data\history.db` (compressed; a year of weekly refreshes of this
+size is a few MB; the newest 520 are kept, `BOM_HISTORY_KEEP` changes that). The dashboard uses it for:
+* **Change badges** on the KPIs: `▲ 3 since 14 Sep` compared with the previous refresh, with the same filters applied.
+* **History page:** a weekly trend chart (on time, SOP issue, SEEG delay, HQ delay), **What changed** between any two
+  refreshes (new / removed models, dates moved later or earlier in weeks, status changes; CSV export), and the list
+  of all refreshes with **View** (look at an earlier week), **Make current** (undo a refresh made with wrong files -
+  nothing is deleted) and **Delete**.
+* **Model timeline:** click any model code to see its dates and statuses across all refreshes; changed cells are
+  highlighted with the slip in weeks.
+* **Weekly-update checks** (shown as Notes): the same 3 files as last time (not stored twice), one file unchanged since
+  last week (probably forgotten), or an SOP file whose latest version is *older* than last week's.
+
+The first start after this update keeps the data already on the PC as the first snapshot. If the history database is
+ever damaged, refreshes still work (the problem is written to `data\pipeline.log`).
+
+Also on the dashboard: **Due in the next 4 weeks** (LOCAL target within 4 weeks but BOM LOCAL plan later or missing)
+and **Issues by project** (click a bar to filter by that project).
 
 ## What the program checks on the 3 files
 * Which file is which is decided by **content** (column names), not file names - the timestamp in a name may change freely.
@@ -30,7 +51,7 @@ Your previous data always stays in place when a refresh is rejected. Technical d
 
 ## Architecture
 `3 Excel files -> Excel COM (one DispatchEx instance, ReadOnly, UpdateLinks=0, bulk Value2, row-chunked)`
-`-> validate + normalise -> SQLite (data\dashboard.db, atomic swap) -> /api/data -> browser KPIs/filters/charts`
+`-> validate + normalise -> SQLite (data\dashboard.db, atomic swap) + snapshot (data\history.db) -> /api/data -> browser`
 
 | Path | Role |
 |---|---|
@@ -39,6 +60,7 @@ Your previous data always stays in place when a refresh is rejected. Technical d
 | `pipeline\sources.py` | content-based recognition/validation + extraction |
 | `pipeline\transform.py` | all business rules |
 | `pipeline\store.py` | SQLite layer (versioned schema, atomic replace with retry) |
+| `pipeline\history.py` | weekly snapshots, trend KPIs, changes between refreshes, per-model timeline |
 | `pipeline\run.py` | orchestration, data-quality checks, CLI |
 | `server.py` | local service (127.0.0.1 only) |
 | `verify.py` | regression check against the original dashboard data |

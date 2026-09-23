@@ -147,7 +147,19 @@ def main():
         raw = open(dl.value.path(), "rb").read()
         check("4b-9. CSV starts with a UTF-8 BOM and follows the visible sort", raw.startswith(b"\xef\xbb\xbf") and
               [l.split(",")[0] for l in raw.decode("utf-8-sig").splitlines()[1:]] == ['"A"', '"B"', '"D"', '"C"'])
-        check("4b-10. no JS errors in the usability features", not errs, errs[:2])
+        page.click("button[data-tab='dashboard']")
+        page.evaluate("""()=>{const t='W'+String(CURRENT_WEEK).padStart(2,'0')+' / '+CURRENT_YEAR;
+            BOM_DATA=[{model:'DUE1',project:'PA',localTarget:t,localStatus:'LATER',hqStatus:'MATCH'},
+                      {model:'OK1',project:'PA',localTarget:t,localStatus:'MATCH',hqStatus:'LATER'},
+                      {model:'FAR',project:'PB',localTarget:'W01 / 2099',localStatus:'LATER'}];renderAll()}""")
+        check("4b-10. 'due in the next 4 weeks' lists only unconfirmed models", page.inner_text("#dueCount").lower() == "1 model" and "DUE1" in page.inner_text("#dueList"),
+              page.inner_text("#dueCount"))
+        check("4b-11. issues by project ranks projects", [t.split("\n")[0] for t in page.locator("#projBars .projbar").all_inner_texts()] == ["PA", "PB"],
+              page.locator("#projBars .projbar").all_inner_texts())
+        page.click("#dueList .mlink")
+        check("4b-12. clicking a model opens its detail panel", page.is_visible("#modelDrawer") and page.inner_text("#drawerModel") == "DUE1")
+        page.keyboard.press("Escape")
+        check("4b-13. no JS errors in the usability features", not errs, errs[:2])
 
         # ---- 5. optional: a live service with a big database ------------------------------------------------
         if served:

@@ -15,6 +15,7 @@ import time
 from typing import Callable, Optional
 
 from . import excel_com as X
+from . import history as H
 from . import sources as S
 from . import transform as T
 
@@ -188,11 +189,21 @@ def _previous_counts(db_path: str) -> Optional[tuple[int, int]]:
         return None
 
 
+def history_path(db_path: str) -> str:
+    return os.path.join(os.path.dirname(os.path.abspath(db_path)), "history.db")
+
+
 def process(paths: list[str], db_path: str, log: Callable[[str], None] = print, pidfile: Optional[str] = None,
-            timeout_s: int = 1200) -> dict:
+            timeout_s: int = 1200, hist_path: Optional[str] = None) -> dict:
     from . import store
+    hist_path = hist_path or history_path(db_path)
     ext = extract_all(paths, log, pidfile, timeout_s)
     bom, master, report = build_datasets(ext)
+    sop_max = report["sop_versions"][1]
+    try:
+        ext["warnings"] += H.compare_with_latest(hist_path, ext["files"], sop_max)
+    except Exception as e:                    # history is an extra: it must never block a refresh
+        log(f"History check skipped: {e}")
     prev = _previous_counts(db_path)
     if prev:
         for label, old, new in (("BOM", prev[0], len(bom)), ("All Models", prev[1], len(master))):
@@ -200,6 +211,12 @@ def process(paths: list[str], db_path: str, log: Callable[[str], None] = print, 
                 ext["warnings"].append(f"{label} dropped from {old} to {new} models - please check the files are the right ones.")
     log("Writing local database ...")
     meta = store.write_db(db_path, ext, bom, master, report)
+    try:
+        sid = H.record(hist_path, meta, bom, master, ext["files"], sop_max)
+        meta["snapshot_id"] = sid
+        log("Saved to history" if sid else "Same files as the last refresh - history unchanged")
+    except Exception as e:
+        log(f"WARNING: the refresh worked but could not be saved to the history ({e})")
     log(f"Done: {len(bom)} BOM models, {len(master)} total models")
     return meta
 

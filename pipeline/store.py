@@ -7,6 +7,7 @@ import os
 import sqlite3
 import tempfile
 import time
+from contextlib import closing
 
 from . import transform as T
 
@@ -34,6 +35,10 @@ CREATE TABLE master_data ({", ".join(MASTER_COLS)}, ord INTEGER PRIMARY KEY);
 
 
 SCHEMA_VERSION = 2
+
+
+def _now() -> str:
+    return dt.datetime.now().isoformat(timespec="seconds")
 
 
 def _atomic_replace(tmp: str, dest: str, attempts: int = 40) -> None:
@@ -68,14 +73,49 @@ def _cell(v):
     return str(v)
 
 
-def write_db(db_path: str, ext: dict, bom: list[dict], master: list[dict], report: dict) -> dict:
+def _write_atomic(db_path: str, fill) -> None:
+    """Build a complete database in a temp file with fill(cursor), then swap it in atomically."""
     os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
     fd, tmp = tempfile.mkstemp(suffix=".db", dir=os.path.dirname(os.path.abspath(db_path)))
     os.close(fd)
+    con = None
     try:
         con = sqlite3.connect(tmp)
         con.executescript(SCHEMA)
-        cur = con.cursor()
+        fill(con.cursor())
+        con.commit()
+        con.close()
+        _atomic_replace(tmp, db_path)     # atomic swap: readers never see a half-written database
+    except BaseException:
+        try:
+            if con is not None:
+                con.close()
+        except Exception:
+            pass
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        raise
+
+
+def _insert_datasets(cur, bom: list[dict], master: list[dict], meta: dict) -> None:
+    cur.executemany(f"INSERT INTO bom_data VALUES ({','.join('?' * (len(BOM_COLS) + 1))})",
+                    [tuple(r.get(c) for c in BOM_COLS) + (i,) for i, r in enumerate(bom)])
+    cur.executemany(f"INSERT INTO master_data VALUES ({','.join('?' * (len(MASTER_COLS) + 1))})",
+                    [tuple(r.get(c) for c in MASTER_COLS) + (i,) for i, r in enumerate(master)])
+    cur.executemany("INSERT INTO meta VALUES (?,?)", [(k, json.dumps(v)) for k, v in meta.items()])
+
+
+def write_db(db_path: str, ext: dict, bom: list[dict], master: list[dict], report: dict) -> dict:
+    meta = {
+        "schema_version": SCHEMA_VERSION,
+        "updated_at": _now(),
+        "files": [{k: f[k] for k in ("role", "name", "sheet", "size")} for f in ext["files"]],
+        "warnings": ext["warnings"],
+        "report": report,
+        "extract_seconds": ext["seconds"],
+    }
+
+    def fill(cur):
         cur.executemany("INSERT INTO source_files VALUES (?,?,?,?,?)",
                         [(f["role"], f["name"], f["sheet"], f["size"], f["sha256"]) for f in ext["files"]])
         cur.executemany("INSERT OR REPLACE INTO dash VALUES (?,?,?,?)",
@@ -95,31 +135,37 @@ def write_db(db_path: str, ext: dict, bom: list[dict], master: list[dict], repor
             first = next((wk[j] for j, x in enumerate(vec) if x > 0), None)
             rows.append((item, cate, ver, float(sum(vec)), first))
         cur.executemany("INSERT INTO sop_qty VALUES (?,?,?,?,?)", rows)
-        cur.executemany(f"INSERT INTO bom_data VALUES ({','.join('?' * (len(BOM_COLS) + 1))})",
-                        [tuple(r[c] for c in BOM_COLS) + (i,) for i, r in enumerate(bom)])
-        cur.executemany(f"INSERT INTO master_data VALUES ({','.join('?' * (len(MASTER_COLS) + 1))})",
-                        [tuple(r[c] for c in MASTER_COLS) + (i,) for i, r in enumerate(master)])
-        meta = {
-            "schema_version": SCHEMA_VERSION,
-            "updated_at": dt.datetime.now().isoformat(timespec="seconds"),
-            "files": [{k: f[k] for k in ("role", "name", "sheet", "size")} for f in ext["files"]],
-            "warnings": ext["warnings"],
-            "report": report,
-            "extract_seconds": ext["seconds"],
-        }
-        cur.executemany("INSERT INTO meta VALUES (?,?)", [(k, json.dumps(v)) for k, v in meta.items()])
-        con.commit()
-        con.close()
-        _atomic_replace(tmp, db_path)     # atomic swap: readers never see a half-written database
-        return meta
-    except BaseException:
-        try:
-            con.close()
-        except Exception:
-            pass
-        if os.path.exists(tmp):
-            os.remove(tmp)
-        raise
+        _insert_datasets(cur, bom, master, meta)
+
+    _write_atomic(db_path, fill)
+    return meta
+
+
+def write_restored(db_path: str, bom: list[dict], master: list[dict], snap_meta: dict) -> dict:
+    """Make an earlier snapshot (from the history) the current data again."""
+    meta = {
+        "schema_version": SCHEMA_VERSION,
+        "updated_at": _now(),
+        "files": [{k: f.get(k) for k in ("role", "name", "sheet", "size")} for f in snap_meta.get("files", [])],
+        "warnings": list(snap_meta.get("warnings", [])),
+        "restored_from": {"snapshot_id": snap_meta.get("snapshot_id"), "taken_at": snap_meta.get("updated_at")},
+    }
+    _write_atomic(db_path, lambda cur: (
+        cur.executemany("INSERT INTO source_files VALUES (?,?,?,?,?)",
+                        [(f.get("role"), f.get("name"), f.get("sheet"), f.get("size"), f.get("sha256"))
+                         for f in snap_meta.get("files", [])]),
+        _insert_datasets(cur, bom, master, meta)))
+    return meta
+
+
+def read_source_files(db_path: str) -> list[dict]:
+    """The source files (with SHA-256) behind the current database; [] if unavailable."""
+    try:
+        with closing(sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)) as con:
+            return [dict(zip(("role", "name", "sheet", "size", "sha256"), r))
+                    for r in con.execute("SELECT role, name, sheet, size, sha256 FROM source_files")]
+    except sqlite3.Error:
+        return []
 
 
 def read_datasets(db_path: str) -> dict:

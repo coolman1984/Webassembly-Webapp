@@ -256,16 +256,53 @@ th.sortable:after{content:" \2195";opacity:.35}th.sortable[aria-sort=ascending]:
 .data-info h4{margin:0 0 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#36536b}
 .data-info ul{margin:4px 0 0;padding-left:18px}.data-info li{margin:2px 0}.data-info .warn li{color:#8a5d0c}
 </style>
+<style id="history-insights">
+.kdelta{display:inline-block;margin-left:7px;padding:2px 6px;border-radius:999px;font-size:8px;font-weight:900;letter-spacing:.02em;text-transform:none;vertical-align:middle;background:#eef2f6;color:#5b6f82}
+.kdelta:empty{display:none}.kdelta.good{background:#e5f5ef;color:#136b58}.kdelta.bad{background:#fdecea;color:#a3372f}
+.insights{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:12px}
+.duelist{display:grid;gap:6px}.duerow{display:grid;grid-template-columns:1.2fr 1fr .8fr .8fr auto;gap:8px;align-items:center;padding:7px 9px;border:1px solid #e7edf2;border-radius:9px;font-size:10px;color:#35546e}
+.duerow.head{border:0;padding:0 9px;font-size:8px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;color:#8193a4}
+.empty-note{font-size:10px;color:#7b8d9f;padding:10px 2px}
+.projbars{display:grid;gap:7px}.projbar{display:grid;grid-template-columns:minmax(80px,1.1fr) 2fr 34px;gap:8px;align-items:center;border:0;background:none;padding:2px 0;font:inherit;font-size:10px;color:#35546e;cursor:pointer;text-align:left}
+.projbar:hover .pb-name{text-decoration:underline}.pb-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
+.pb-track{height:10px;background:#eef2f5;border-radius:4px;overflow:hidden}.pb-fill{display:block;height:100%;background:#c65048;border-radius:0 4px 4px 0}.pb-n{font-weight:900;text-align:right;font-variant-numeric:tabular-nums}
+.mlink{border:0;background:none;padding:0;font:inherit;color:#1d5f8f;font-weight:850;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.mlink:hover{color:#0b2340}
+.viewing-banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 17px 0;padding:9px 13px;border-radius:11px;background:#fff4db;border:1px solid #f0d596;color:#6d4906;font-size:11px;font-weight:800}
+.viewing-banner[hidden]{display:none}.viewing-banner button{border:1px solid #6d4906;background:#6d4906;color:#fff;border-radius:8px;padding:5px 10px;font:inherit;font-size:10px;cursor:pointer}
+.hist-grid{display:grid;gap:12px}.hist-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(17,47,75,.05);padding:14px 16px}
+.hist-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.hist-title{font-size:14px;font-weight:900;color:#173a58}.hist-sub{font-size:9.5px;color:#7b8d9f;margin-top:3px;line-height:1.45}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;font-size:10px;color:#35546e;font-weight:800}.legend-row i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.trend-wrap{position:relative}.trend-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.trend-tip{position:absolute;pointer-events:none;background:#0b2340;color:#fff;border-radius:9px;padding:8px 10px;font-size:10px;line-height:1.55;box-shadow:0 8px 22px rgba(0,0,0,.18);white-space:nowrap;z-index:5}
+.trend-tip[hidden]{display:none}.trend-tip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.cmp{display:flex;align-items:center;gap:7px;font-size:10px;color:#48637a;flex-wrap:wrap}.cmp select{height:30px;border:1px solid #d7e1e9;border-radius:8px;background:#fff;color:var(--ink);padding:0 8px;font:inherit;font-size:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.chips button{border:1px solid #d8e2ea;background:#fff;color:#35546e;border-radius:999px;padding:5px 11px;font:inherit;font-size:10px;font-weight:850;cursor:pointer}
+.chips button.active{background:#173f62;border-color:#173f62;color:#fff}.chips b{font-variant-numeric:tabular-nums}
+.slip-up{color:#a3372f;font-weight:900}.slip-down{color:#136b58;font-weight:900}
+.hist-table{width:100%;min-width:0;border-collapse:separate;border-spacing:0;font-size:10px}.hist-table th,.hist-table td{padding:7px 8px;white-space:nowrap}
+.hist-table td.files{white-space:normal;max-width:360px;color:#6f8396;font-size:9px}.hist-scroll{overflow:auto;max-height:430px;border:1px solid #edf1f4;border-radius:10px}
+.rowtag{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:999px;background:#e5f5ef;color:#136b58;font-size:8px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}.rowtag.view{background:#fff4db;color:#8a5d0c}
+.hbtn{border:1px solid #d7e1e8;background:#fff;color:#2d5876;border-radius:7px;padding:4px 8px;font:inherit;font-size:9px;font-weight:850;cursor:pointer;margin-right:4px}.hbtn.danger{color:#a3372f}
+.drawer-back{position:fixed;inset:0;background:rgba(7,26,49,.35);z-index:90}.drawer-back[hidden]{display:none}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:#fff;z-index:91;box-shadow:-12px 0 40px rgba(7,26,49,.2);padding:18px 20px;overflow:auto}
+.drawer[hidden]{display:none}.drawer h3{margin:4px 0 2px;font-size:20px;color:#153a58}.drawer .close{float:right;border:1px solid #d7e1e8;background:#fff;border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.kv div{border:1px solid #e7edf2;border-radius:9px;padding:7px 9px}.kv>div>span{display:block;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#8193a4;font-weight:900}.kv b{font-size:11px;color:#1d3d59}
+.tl td.changed{background:#fff8e6;font-weight:900}
+@media(max-width:900px){.insights{grid-template-columns:1fr}.kv{grid-template-columns:1fr 1fr}.duerow{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 <div class="app">
 <aside class="side">
   <div class="brand"><small>BOM CONTROL</small><h1>Confirmation<br>Plan</h1></div>
-  <div class="nav"><button class="active" data-tab="dashboard">● <span>Dashboard</span></button><button data-tab="bom">▦ <span>BOM Plan</span></button><button data-tab="update">↑ <span>Update Data</span></button><button data-tab="master">☷ <span>All Models</span></button></div>
+  <div class="nav"><button class="active" data-tab="dashboard">● <span>Dashboard</span></button><button data-tab="bom">▦ <span>BOM Plan</span></button><button data-tab="history">◷ <span>History</span></button><button data-tab="update">↑ <span>Update Data</span></button><button data-tab="master">☷ <span>All Models</span></button></div>
   <div class="sidefoot"><span id="todayLabel"></span><br>Offline · self-contained</div>
 </aside>
 <div class="main">
   <div class="topbar"><div class="filters"><div class="label">Global Filter</div><input id="globalSearch" placeholder="Search model / project / inch…"><select id="globalProject"><option value="">All Projects</option></select><button class="reset" id="resetBtn">Reset</button></div></div>
+  <div class="viewing-banner" id="viewingBanner" hidden><span id="viewingText"></span><button type="button" id="backToCurrent">Back to current data</button></div>
 
   <section class="slide active" id="dashboard"><div class="content">
     <div class="dash-top"><div class="dash-brand"><i></i>BOM Confirmation Control</div><div class="dash-meta">Status &amp; Issue Management</div></div>
@@ -303,7 +340,7 @@ th.sortable:after{content:" \2195";opacity:.35}th.sortable[aria-sort=ascending]:
         <div class="panelhead"><div><div class="eyebrow">01 · Confirmation status</div><div class="paneltitle">Status</div><div class="panelsub">SEEG / LOCAL confirmation against the 12-week timing rule.</div></div><div class="badge" id="statusScope">371 models</div></div>
         <div class="panelbody">
           <div class="statgrid">
-            <div class="stat on"><div class="statlabel">Confirmation on time</div><div class="count"><b id="stOn">259</b><span>/ <span id="stOnTotal" class="status-total">371</span></span></div><div class="desc">Confirmation within the 12-week rule</div><div class="status-bar"><span id="stOnFill"></span></div></div>
+            <div class="stat on"><div class="statlabel">Confirmation on time<span class="kdelta" id="dOn"></span></div><div class="count"><b id="stOn">259</b><span>/ <span id="stOnTotal" class="status-total">371</span></span></div><div class="desc">Confirmation within the 12-week rule</div><div class="status-bar"><span id="stOnFill"></span></div></div>
             <div class="stat prog"><div class="statlabel">In progress</div><div class="count"><b id="stProg">0</b><span>/ <span id="stProgTotal" class="status-total">371</span></span></div><div class="desc">Confirmation planned in current week</div><div class="status-bar"><span id="stProgFill"></span></div></div>
             <div class="stat plan"><div class="statlabel">Planned</div><div class="count"><b id="stPlan">0</b><span>/ <span id="stPlanTotal" class="status-total">371</span></span></div><div class="desc">Confirmation planned after current week</div><div class="status-bar"><span id="stPlanFill"></span></div></div>
           </div>
@@ -316,12 +353,22 @@ th.sortable:after{content:" \2195";opacity:.35}th.sortable[aria-sort=ascending]:
         <div class="panelhead"><div><div class="eyebrow">02 · Exception watch</div><div class="paneltitle">Issues</div><div class="panelsub">Models requiring action because SOP timing or BOM confirmation is outside target.</div></div><div class="badge action">Action watch</div></div>
         <div class="panelbody">
           <div class="issues">
-            <div class="issue sop"><div class="issuetop"><div class="issuename"><i></i>SOP issue</div><div class="issuecount"><b id="issGap">65</b><span id="issGapRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> 1st Appear → 1st MP &lt; 12 weeks</div><div class="issuebar"><span id="issGapFill"></span></div><div class="actions"><button class="view danger" id="viewSopBtn">View 65 models</button></div></div>
-            <div class="issue hq"><div class="issuetop"><div class="issuename"><i></i>HQ delay</div><div class="issuecount"><b id="issHQ">111</b><span id="issHQRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> Confirmation after SOP −13W target</div><div class="issuebar"><span id="issHQFill"></span></div><div class="actions"><button class="view" id="viewHqBtn">View 111 models</button></div></div>
-            <div class="issue seeg"><div class="issuetop"><div class="issuename"><i></i>SEEG delay</div><div class="issuecount"><b id="issSEEG">111</b><span id="issSEEGRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> Confirmation after SOP −12W target</div><div class="issuebar"><span id="issSEEGFill"></span></div><div class="actions"><button class="view" id="viewSeegBtn">View 111 models</button></div></div>
+            <div class="issue sop"><div class="issuetop"><div class="issuename"><i></i>SOP issue<span class="kdelta" id="dSop"></span></div><div class="issuecount"><b id="issGap">65</b><span id="issGapRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> 1st Appear → 1st MP &lt; 12 weeks</div><div class="issuebar"><span id="issGapFill"></span></div><div class="actions"><button class="view danger" id="viewSopBtn">View 65 models</button></div></div>
+            <div class="issue hq"><div class="issuetop"><div class="issuename"><i></i>HQ delay<span class="kdelta" id="dHq"></span></div><div class="issuecount"><b id="issHQ">111</b><span id="issHQRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> Confirmation after SOP −13W target</div><div class="issuebar"><span id="issHQFill"></span></div><div class="actions"><button class="view" id="viewHqBtn">View 111 models</button></div></div>
+            <div class="issue seeg"><div class="issuetop"><div class="issuename"><i></i>SEEG delay<span class="kdelta" id="dSeeg"></span></div><div class="issuecount"><b id="issSEEG">111</b><span id="issSEEGRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> Confirmation after SOP −12W target</div><div class="issuebar"><span id="issSEEGFill"></span></div><div class="actions"><button class="view" id="viewSeegBtn">View 111 models</button></div></div>
           </div>
           <div class="notice" id="issueSummary">Issue counts update with the global filter.</div>
         </div>
+      </section>
+    </div>
+    <div class="insights">
+      <section class="panel">
+        <div class="panelhead"><div><div class="eyebrow">03 · Coming up</div><div class="paneltitle">Due in the next 4 weeks</div><div class="panelsub">LOCAL target within 4 weeks, but the BOM LOCAL plan is later than the target or missing.</div></div><div class="badge action" id="dueCount">0 models</div></div>
+        <div class="panelbody"><div class="duelist" id="dueList"></div><div class="actions" style="margin-top:9px"><button class="view danger" id="viewDueBtn">View all</button></div></div>
+      </section>
+      <section class="panel">
+        <div class="panelhead"><div><div class="eyebrow">04 · Where</div><div class="paneltitle">Issues by project</div><div class="panelsub">Models with at least one issue (SOP, HQ or SEEG). Click a project to filter everything by it.</div></div></div>
+        <div class="panelbody"><div class="projbars" id="projBars"></div></div>
       </section>
     </div>
   </div></section>
@@ -389,10 +436,40 @@ th.sortable:after{content:" \2195";opacity:.35}th.sortable[aria-sort=ascending]:
   </div>
 </section>
 
+<section class="slide" id="history"><div class="content"><div class="hist-grid">
+  <div class="empty-state" id="histUnavailable">The history is kept by the local service. Open the dashboard with <b>start_dashboard.bat</b> to see it.</div>
+  <section class="hist-card">
+    <div class="hist-head"><div><div class="hist-title">Weekly trend</div><div class="hist-sub" id="trendSub">Every refresh is kept. Headline numbers per refresh, for the whole BOM scope.</div></div>
+      <div class="legend-row" id="trendLegend"></div></div>
+    <div class="trend-wrap" id="trendWrap"><div class="empty-note">No refresh has been stored yet.</div></div>
+  </section>
+  <section class="hist-card">
+    <div class="hist-head"><div><div class="hist-title">What changed</div><div class="hist-sub">BOM models added, removed or changed between two refreshes. A slip is how many weeks a date moved (+ later, − earlier).</div></div>
+      <div class="cmp">From <select id="cmpFrom"></select> to <select id="cmpTo"></select><button class="view" id="exportChanges">Export CSV</button></div></div>
+    <div class="chips" id="chgChips"></div>
+    <div class="hist-scroll"><table class="hist-table"><thead><tr><th>Model</th><th>Project</th><th>What changed</th><th>Before</th><th>After</th><th>Slip</th></tr></thead><tbody id="chgBody"></tbody></table></div>
+    <div class="small" id="chgInfo" style="margin-top:6px"></div>
+  </section>
+  <section class="hist-card">
+    <div class="hist-head"><div><div class="hist-title">All refreshes</div><div class="hist-sub">View an earlier week, make it the current data again (if a wrong file was used), or delete it from the history.</div></div></div>
+    <div class="hist-scroll"><table class="hist-table"><thead><tr><th>Refreshed</th><th>BOM</th><th>On time</th><th>SOP issue</th><th>HQ delay</th><th>SEEG delay</th><th>Notes</th><th>Source files</th><th></th></tr></thead><tbody id="snapBody"></tbody></table></div>
+  </section>
+</div></div></section>
+
 <section class="slide" id="bom"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">BOM Confirmation Plan</div><div class="tablesub"><span id="bomSub"></span><span class="filter-chip" id="bomFilterChip"><span id="bomFilterText"></span><button type="button" id="bomFilterClear" title="Show all BOM models" aria-label="Clear issue filter">×</button></span></div></div><button id="exportBom" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>BOM HQ</th><th>BOM LOCAL</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>HQ Status</th><th>LOCAL Status</th></tr></thead><tbody id="bomBody"></tbody></table></div><div class="pager"><span class="small" id="bomInfo"></span><div><button id="bomPrev">‹</button><button id="bomNext">›</button></div></div></div></div></section>
 
   <section class="slide" id="master"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">All Models</div><div class="tablesub" id="masterSub">Complete deduplicated model universe</div></div><button id="exportMaster" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>Project Name</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>BOM HQ</th><th>BOM LOCAL</th><th>HQ Status</th><th>LOCAL Status</th><th>Coverage</th></tr></thead><tbody id="masterBody"></tbody></table></div><div class="pager"><span class="small" id="masterInfo"></span><div><button id="masterPrev">‹</button><button id="masterNext">›</button></div></div></div></div></section>
 </div></div>
+
+<div class="drawer-back" id="drawerBack" hidden></div>
+<aside class="drawer" id="modelDrawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawerModel">
+  <button type="button" class="close" id="drawerClose" aria-label="Close">×</button>
+  <div class="eyebrow">Model</div><h3 id="drawerModel"></h3><div class="panelsub" id="drawerSub"></div>
+  <div class="kv" id="drawerKv"></div>
+  <div class="hist-title" style="font-size:12px">Across the weekly refreshes</div>
+  <div class="hist-sub">A highlighted cell changed since the refresh before it (+/− weeks = moved later/earlier).</div>
+  <div class="hist-scroll" style="margin-top:8px"><table class="hist-table tl"><thead><tr><th>Refreshed</th><th>1st MP</th><th>BOM HQ</th><th>BOM LOCAL</th><th>HQ</th><th>LOCAL</th><th>1st Appear → MP</th></tr></thead><tbody id="drawerTl"></tbody></table></div>
+</aside>
 
 <script>
 let BOM_DATA=[];  // populated live by the local service (see server.py /api/data) - never a static real-data snapshot
@@ -402,7 +479,7 @@ const TODAY=new Date(),NOW_WEEK=isoWeek(TODAY);
 const CURRENT_YEAR=NOW_WEEK.y,CURRENT_WEEK=NOW_WEEK.w,PAGE_SIZE=35;
 const BOM_KEYS=['model','project','inch','bomHQ','bomLocal','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','hqStatus','localStatus'];
 const MASTER_KEYS=['model','project','inch','projectName','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','bomHQ','bomLocal','hqStatus','localStatus','coverage'];
-const ISSUE_NAMES={sop:'SOP issue',hq:'HQ delay',seeg:'SEEG delay'};
+const ISSUE_NAMES={sop:'SOP issue',hq:'HQ delay',seeg:'SEEG delay',due:'due in the next 4 weeks'};
 let state={tab:'dashboard',bomPage:1,masterPage:1,issueFilter:'',sort:{bom:null,master:null}};
 // Column sorting: week labels sort chronologically, "N weeks" and numbers numerically, blanks always last.
 function sortVal(v){if(v===null||v===undefined)return null;const s=String(v).trim();if(!s||s==='—'||s==='N/A')return null;const w=week(s);if(w)return idx(w);const g=gapNum(s);if(g!==null)return g;const n=s.match(/^(?:Version\s+)?(-?\d+(?:\.\d+)?)$/i);return n?+n[1]:s.toLowerCase()}
@@ -422,8 +499,12 @@ function week(s){const m=String(s||'').match(/W(\d{1,2})\s*\/\s*(\d{4})/i);retur
 function idx(w){return w?w.y*53+w.w:null}
 function pct(n,t){return t?((n/t)*100).toFixed(1):'0.0'}
 function gapNum(s){const m=String(s||'').match(/(-?\d+(?:\.\d+)?)\s*weeks?/i);return m?+m[1]:null}
-function issueRows(rows,k){if(k==='sop')return rows.filter(x=>{const g=gapNum(x.firstAppearMpGap);return g!==null&&g<12});if(k==='hq')return rows.filter(x=>x.hqStatus==='LATER');if(k==='seeg')return rows.filter(x=>x.localStatus==='LATER');return rows}
-function baseBOM(){const q=(document.getElementById('globalSearch').value||'').toLowerCase().trim(),p=document.getElementById('globalProject').value||'';return BOM_DATA.filter(x=>(!q||[x.model,x.project,x.inch].join(' ').toLowerCase().includes(q))&&(!p||x.project===p))}
+function issueRows(rows,k){if(k==='sop')return rows.filter(x=>{const g=gapNum(x.firstAppearMpGap);return g!==null&&g<12});if(k==='hq')return rows.filter(x=>x.hqStatus==='LATER');if(k==='seeg')return rows.filter(x=>x.localStatus==='LATER');if(k==='due')return rows.filter(isDue);return rows}
+const DUE_WEEKS=4;
+function isDue(x){const t=week(x.localTarget);if(!t)return false;const d=idx(t)-idx({y:CURRENT_YEAR,w:CURRENT_WEEK});return d>=0&&d<=DUE_WEEKS&&x.localStatus!=='MATCH'&&x.localStatus!=='EARLIER'}
+function mlink(v){return v?'<button type="button" class="mlink" data-model="'+esc(v)+'">'+esc(v)+'</button>':'—'}
+function baseBOM(){return filterBOMRows(BOM_DATA)}
+function filterBOMRows(rows){const q=(document.getElementById('globalSearch').value||'').toLowerCase().trim(),p=document.getElementById('globalProject').value||'';return rows.filter(x=>(!q||[x.model,x.project,x.inch].join(' ').toLowerCase().includes(q))&&(!p||x.project===p))}
 function filteredBOM(){const r=baseBOM();return state.issueFilter?issueRows(r,state.issueFilter):r}
 function filteredMaster(){const q=(document.getElementById('globalSearch').value||'').toLowerCase().trim(),p=document.getElementById('globalProject').value||'';return MASTER_DATA.filter(x=>(!q||[x.model,x.project,x.inch,x.projectName,x.coverage].join(' ').toLowerCase().includes(q))&&(!p||x.project===p))}
 function statusOf(x){const w=week(x.bomLocal);if(!w)return 'PLANNED';if(x.localStatus==='MATCH'&&idx(w)>=idx({y:CURRENT_YEAR,w:CURRENT_WEEK}))return 'ON TIME';if(w.y===CURRENT_YEAR&&w.w===CURRENT_WEEK)return 'IN PROGRESS';if(idx(w)>idx({y:CURRENT_YEAR,w:CURRENT_WEEK}))return 'PLANNED';return x.localStatus==='MATCH'?'ON TIME':'PLANNED'}
@@ -468,6 +549,7 @@ function renderDashboard(){
     if(e)e.style.width=(base.length?((n/base.length)*100):0)+'%';
   };
   const es=document.getElementById('emptyState');if(es)es.classList.toggle('show',!BOM_DATA.length&&!MASTER_DATA.length);
+  if(window.renderInsights)window.renderInsights(base);
   sb('stOnFill',on);
   sb('stProgFill',prog);
   sb('stPlanFill',plan);
@@ -476,12 +558,12 @@ function renderDashboard(){
 
 function renderBOM(){
   const rows=sortRows(filteredBOM(),'bom'),start=(state.bomPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
-  document.getElementById('bomBody').innerHTML=vis.map(x=>'<tr><td>'+val(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td></tr>').join('');
+  document.getElementById('bomBody').innerHTML=vis.map(x=>'<tr><td>'+mlink(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td></tr>').join('');
   const end=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('bomInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';document.getElementById('bomSub').textContent=rows.length.toLocaleString()+' models shown · BOM confirmation scope';const chip=document.getElementById('bomFilterChip');chip.classList.toggle('show',!!state.issueFilter);document.getElementById('bomFilterText').textContent=state.issueFilter?'Only: '+ISSUE_NAMES[state.issueFilter]:'';
 }
 function renderMaster(){
   const rows=sortRows(filteredMaster(),'master'),start=(state.masterPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
-  document.getElementById('masterBody').innerHTML=vis.map(x=>'<tr><td>'+val(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.projectName)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td><td>'+val(x.coverage)+'</td></tr>').join('');
+  document.getElementById('masterBody').innerHTML=vis.map(x=>'<tr><td>'+mlink(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.projectName)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td><td>'+val(x.coverage)+'</td></tr>').join('');
   const end=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('masterInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';
   document.getElementById('masterSub').textContent='Complete deduplicated model universe · '+rows.length.toLocaleString()+' models';
 }
@@ -523,6 +605,7 @@ renderAll();
   const setStatus=t=>{$('updateStatus').textContent=t};
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   let busy=false,lastUpdated=null;
+  window.VIEWING=null;   // set while an earlier refresh from the history is on screen
   async function api(path,opt){
     opt=Object.assign({},opt);opt.headers=Object.assign({'X-Requested-With':'bom-dashboard'},opt.headers);
     let r;
@@ -545,6 +628,7 @@ renderAll();
     lastUpdated=(d.meta&&d.meta.updated_at)||lastUpdated;
     renderAll();
     showMeta(d.meta||{});
+    if(window.onDataApplied)window.onDataApplied(d);
   }
   const ROLE_NAMES={DASH:'Model source (DASH)',SEEG:'SOP source (SEEG)',NEWMODEL:'BOM source (New Model)'};
   const fmtWhen=t=>{if(!t)return 'unknown';const d=new Date(t);return isNaN(d)?String(t).replace('T',' '):d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})};
@@ -599,6 +683,7 @@ renderAll();
         if(s.state==='error')throw new Error(s.error||'processing failed');
       }
       const d=await api('/api/data');
+      window.VIEWING=null;
       applyData(d);
       setStatus(`Updated successfully · ${BOM_DATA.length} BOM models · ${MASTER_DATA.length} total models`);
       const w=(d.meta&&d.meta.warnings)||[];
@@ -620,7 +705,7 @@ renderAll();
   // newer data (e.g. refreshed from another tab) whenever this tab becomes visible again.
   const stamp=d=>' ('+String((d.meta&&d.meta.updated_at)||'').replace('T',' ')+')';
   async function pull(){
-    if(!served||busy)return;
+    if(!served||busy||window.VIEWING)return;
     try{
       const m=await api('/api/meta');
       if(!m.updated_at||m.updated_at===lastUpdated)return;
@@ -629,11 +714,204 @@ renderAll();
       setStatus('System ready · data from local database'+stamp(d));
     }catch(e){}
   }
+  window.BOM_ENGINE={api,applyData,served,setStatus,pull};
   if(served){
     pull();
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
     setInterval(pull,60000);
   }
+})();
+</script>
+
+<script>
+/* === HISTORY & INSIGHTS · weekly snapshots, trend, what changed, model timeline === */
+(function(){
+  const $=id=>document.getElementById(id);
+  const E=window.BOM_ENGINE||{served:false};
+  const SERIES=[   // colour order validated for colour-blind separation (dataviz palette check)
+    {k:'onTime',name:'On time',c:'#1f8b73'},{k:'sopIssue',name:'SOP issue',c:'#c65048'},
+    {k:'seegDelay',name:'SEEG delay',c:'#4f78b8'},{k:'hqDelay',name:'HQ delay',c:'#b07d16'}];
+  const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const day=t=>{const m=String(t||'').match(/^(\d{4})-(\d\d)-(\d\d)(?:T(\d\d):(\d\d))?/);return m?{d:+m[3]+' '+MON[+m[2]-1],full:+m[3]+' '+MON[+m[2]-1]+' '+m[1]+(m[4]?' '+m[4]+':'+m[5]:'')}:{d:String(t||''),full:String(t||'')}};
+  let SNAPS=[],CUR_META={},PREV=null,CHG=null,chgFilter='all',PREV_CACHE={};
+
+  // ------------------------------------------------------------------ dashboard: deltas, due list, projects
+  function counts(rows){return {on:rows.filter(x=>x.localStatus==='MATCH').length,sop:issueRows(rows,'sop').length,
+    hq:rows.filter(x=>x.hqStatus==='LATER').length,seeg:rows.filter(x=>x.localStatus==='LATER').length}}
+  function delta(id,now,prev,upIsGood){
+    const e=$(id);if(!e)return;
+    if(prev===null){e.textContent='';e.className='kdelta';return}
+    const d=now-prev,when=day(PREV.taken_at).d;
+    e.textContent=d===0?'= since '+when:(d>0?'▲ ':'▼ ')+Math.abs(d)+' since '+when;
+    e.className='kdelta'+(d===0?'':((d>0)===upIsGood?' good':' bad'));
+    e.title='Previous refresh: '+day(PREV.taken_at).full+' · was '+prev;
+  }
+  window.renderInsights=function(base){
+    const c=counts(base),p=PREV?counts(filterBOMRows(PREV.bom)):null;
+    delta('dOn',c.on,p&&p.on,true);delta('dSop',c.sop,p&&p.sop,false);delta('dHq',c.hq,p&&p.hq,false);delta('dSeeg',c.seeg,p&&p.seeg,false);
+    const due=issueRows(base,'due').sort((a,b)=>idx(week(a.localTarget))-idx(week(b.localTarget)));
+    $('dueCount').textContent=due.length.toLocaleString()+' model'+(due.length===1?'':'s');
+    $('viewDueBtn').textContent='View all '+due.length;$('viewDueBtn').hidden=!due.length;
+    $('dueList').innerHTML=due.length?'<div class="duerow head"><span>Model</span><span>Project</span><span>LOCAL target</span><span>BOM LOCAL plan</span><span>Status</span></div>'
+      +due.slice(0,6).map(x=>'<div class="duerow"><span>'+mlink(x.model)+'</span><span>'+val(x.project)+'</span><span>'+val(x.localTarget)+'</span><span>'+val(x.bomLocal)+'</span><span>'+badge(x.localStatus)+'</span></div>').join('')
+      :'<div class="empty-note">Nothing due in the next '+DUE_WEEKS+' weeks. ✓</div>';
+    const per={};base.forEach(x=>{const g=gapNum(x.firstAppearMpGap);if((g!==null&&g<12)||x.hqStatus==='LATER'||x.localStatus==='LATER'){const k=x.project||'(no project)';per[k]=(per[k]||0)+1}});
+    const top=Object.entries(per).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,8),mx=top.length?top[0][1]:1;
+    $('projBars').innerHTML=top.length?top.map(([k,n])=>'<button type="button" class="projbar" data-project="'+esc(k)+'" title="Filter by '+esc(k)+'"><span class="pb-name">'+esc(k)+'</span><span class="pb-track"><span class="pb-fill" style="width:'+(n/mx*100).toFixed(1)+'%"></span></span><span class="pb-n">'+n+'</span></button>').join('')
+      :'<div class="empty-note">No issues in the current scope. ✓</div>';
+  };
+  $('viewDueBtn').addEventListener('click',()=>{state.issueFilter='due';state.bomPage=1;show('bom')});
+  $('projBars').addEventListener('click',e=>{const b=e.target.closest('.projbar');if(!b||b.dataset.project==='(no project)')return;
+    const sel=$('globalProject');if(![...sel.options].some(o=>o.value===b.dataset.project))return;sel.value=b.dataset.project;sel.dispatchEvent(new Event('change'))});
+
+  // ------------------------------------------------------------------ model drawer
+  const FIELDS=[['project','Project'],['inch','Inch'],['projectName','Project name'],['mp','1st MP'],['bomHQ','BOM HQ'],['bomLocal','BOM LOCAL'],
+    ['hqTarget','HQ target (−13W)'],['localTarget','LOCAL target (−12W)'],['firstAppearMpGap','1st Appear → 1st MP'],['hqStatus','HQ status'],['localStatus','LOCAL status'],['coverage','Coverage']];
+  function closeDrawer(){$('modelDrawer').hidden=true;$('drawerBack').hidden=true}
+  async function openModel(code){
+    const r=BOM_DATA.find(x=>x.model===code)||MASTER_DATA.find(x=>x.model===code)||{model:code};
+    const m=MASTER_DATA.find(x=>x.model===code)||{};
+    $('drawerModel').textContent=code;
+    $('drawerSub').textContent=BOM_DATA.some(x=>x.model===code)?'In the BOM confirmation plan':'Not in the BOM confirmation plan';
+    $('drawerKv').innerHTML=FIELDS.filter(([k])=>(r[k]??m[k])!==undefined).map(([k,l])=>'<div><span>'+esc(l)+'</span><b>'+(k.endsWith('Status')?badge(r[k]??m[k]):val(r[k]??m[k]))+'</b></div>').join('');
+    $('drawerTl').innerHTML='<tr><td colspan="7" class="small">'+(E.served?'Loading…':'The weekly history is available when the dashboard is opened with start_dashboard.bat.')+'</td></tr>';
+    $('modelDrawer').hidden=false;$('drawerBack').hidden=false;$('drawerClose').focus();
+    if(!E.served)return;
+    try{
+      const h=(await E.api('/api/model?code='+encodeURIComponent(code))).history;
+      if($('drawerModel').textContent!==code)return;
+      if(!h.length){$('drawerTl').innerHTML='<tr><td colspan="7" class="small">This model is not in the BOM plan of any stored refresh.</td></tr>';return}
+      const keys=['mp','bomHQ','bomLocal','hqStatus','localStatus','firstAppearMpGap'];
+      $('drawerTl').innerHTML=h.map((x,i)=>{const p=i?h[i-1]:null;
+        return '<tr><td>'+esc(day(x.taken_at).full)+'</td>'+(x.inBom?keys.map(k=>{const ch=p&&p.inBom&&(p[k]||'')!==(x[k]||'');
+          let extra='';if(ch&&['mp','bomHQ','bomLocal'].includes(k)){const a=week(p[k]),b=week(x[k]);if(a&&b){const d=weekDiff(a,b);if(d)extra=' <span class="'+(d>0?'slip-up':'slip-down')+'">'+(d>0?'+':'−')+Math.abs(d)+'w</span>'}}
+          return '<td'+(ch?' class="changed"':'')+'>'+(k.endsWith('Status')?badge(x[k]):val(x[k]))+extra+'</td>'}).join(''):'<td colspan="6" class="small">not in the BOM plan in this refresh</td>')+'</tr>'}).join('');
+    }catch(e){$('drawerTl').innerHTML='<tr><td colspan="7" class="small">'+esc(e.message)+'</td></tr>'}
+  }
+  function weekDiff(a,b){const mon=w=>{const j4=new Date(Date.UTC(w.y,0,4)),d=(j4.getUTCDay()||7);return Date.UTC(w.y,0,4)-(d-1)*864e5+(w.w-1)*7*864e5};return Math.round((mon(b)-mon(a))/(7*864e5))}
+  document.addEventListener('click',e=>{const b=e.target.closest('.mlink');if(b){e.preventDefault();openModel(b.dataset.model)}});
+  $('drawerClose').addEventListener('click',closeDrawer);$('drawerBack').addEventListener('click',closeDrawer);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modelDrawer').hidden)closeDrawer()});
+
+  // ------------------------------------------------------------------ history tab
+  function asOf(){return window.VIEWING?window.VIEWING.taken_at:((CUR_META.restored_from&&CUR_META.restored_from.taken_at)||CUR_META.updated_at||'')}
+  async function loadHistory(){
+    if(!E.served){$('histUnavailable').classList.add('show');return}
+    try{SNAPS=(await E.api('/api/history')).snapshots||[]}catch(e){SNAPS=[]}
+    const t=asOf(),prev=[...SNAPS].reverse().find(s=>s.taken_at<t);
+    PREV=null;
+    if(prev){try{PREV_CACHE[prev.id]=PREV_CACHE[prev.id]||await E.api('/api/history/'+prev.id);PREV={taken_at:prev.taken_at,bom:PREV_CACHE[prev.id].bom}}catch(e){}}
+    renderTrend();renderSnaps();fillCompare();renderDashboard();
+    await loadChanges();
+  }
+  function renderTrend(){
+    $('trendLegend').innerHTML=SERIES.map(s=>'<span><i style="background:'+s.c+'"></i>'+s.name+'</span>').join('');
+    const wrap=$('trendWrap');
+    if(!SNAPS.length){wrap.innerHTML='<div class="empty-note">No refresh has been stored yet. Each refresh adds one point.</div>';return}
+    $('trendSub').textContent=SNAPS.length+' refresh'+(SNAPS.length>1?'es':'')+' stored, '+day(SNAPS[0].taken_at).full+' → '+day(SNAPS[SNAPS.length-1].taken_at).full+'. Whole BOM scope, not filtered.';
+    const W=Math.max(560,wrap.clientWidth||900),H=250,L=38,R=112,T=12,B=30,n=SNAPS.length;
+    const mx=Math.max(1,...SNAPS.flatMap(s=>SERIES.map(x=>s.kpi[x.k]||0)));
+    const mag=Math.pow(10,Math.floor(Math.log10(mx))),step=[1,2,5,10].map(f=>f*mag).find(v=>mx/v<=5)||mag*10,tickStep=Math.max(1,step),top=Math.ceil(mx/tickStep)*tickStep;
+    const X=i=>n===1?L+(W-L-R)/2:L+i*(W-L-R)/(n-1),Y=v=>T+(H-T-B)*(1-v/top);
+    let g='';
+    for(let v=0;v<=top;v+=tickStep){const y=Y(v);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="#e6edf2"/><text x="'+(L-6)+'" y="'+(y+3)+'" text-anchor="end" font-size="9" fill="#7b8d9f">'+Math.round(v)+'</text>'}
+    const every=Math.max(1,Math.ceil(n/8));
+    SNAPS.forEach((s,i)=>{if(i%every===0||i===n-1)g+='<text x="'+X(i)+'" y="'+(H-10)+'" text-anchor="middle" font-size="9" fill="#7b8d9f">'+esc(day(s.taken_at).d)+'</text>'});
+    const ends=[];
+    SERIES.forEach(se=>{const pts=SNAPS.map((s,i)=>X(i).toFixed(1)+','+Y(s.kpi[se.k]||0).toFixed(1));
+      if(n>1)g+='<polyline fill="none" stroke="'+se.c+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="'+pts.join(' ')+'"/>';
+      SNAPS.forEach((s,i)=>{g+='<circle cx="'+X(i)+'" cy="'+Y(s.kpi[se.k]||0)+'" r="4" fill="'+se.c+'" stroke="#fff" stroke-width="2"/>'});
+      ends.push({y:Y(SNAPS[n-1].kpi[se.k]||0),t:(SNAPS[n-1].kpi[se.k]||0)+' '+se.name,c:se.c})});
+    ends.sort((a,b)=>a.y-b.y);for(let i=1;i<ends.length;i++)if(ends[i].y-ends[i-1].y<12)ends[i].y=ends[i-1].y+12;
+    ends.forEach(e=>{g+='<text x="'+(X(n-1)+9)+'" y="'+(e.y+3)+'" font-size="10" font-weight="800" fill="#35546e"><tspan fill="'+e.c+'">●</tspan> '+esc(e.t)+'</text>'});
+    g+='<line id="trendCross" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" stroke="#9fb1c1" stroke-dasharray="3 3" visibility="hidden"/>';
+    g+='<rect id="trendHit" x="'+(L-10)+'" y="0" width="'+(W-L-R+20)+'" height="'+H+'" fill="transparent"/>';
+    wrap.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Weekly trend of on-time models and issues">'+g+'</svg><div class="trend-tip" id="trendTip" hidden></div>';
+    const svg=wrap.querySelector('svg'),tip=$('trendTip'),cross=$('trendCross');
+    const hide=()=>{tip.hidden=true;cross.setAttribute('visibility','hidden')};
+    $('trendHit').addEventListener('mousemove',ev=>{
+      const r=svg.getBoundingClientRect(),x=(ev.clientX-r.left)*W/r.width;
+      let i=0,best=1e9;SNAPS.forEach((s,j)=>{const d=Math.abs(X(j)-x);if(d<best){best=d;i=j}});
+      const s=SNAPS[i];cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.setAttribute('visibility','visible');
+      tip.innerHTML='<b>'+esc(day(s.taken_at).full)+'</b><br>'+SERIES.map(se=>'<i style="background:'+se.c+'"></i>'+se.name+': <b>'+(s.kpi[se.k]||0)+'</b>').join('<br>')+'<br>BOM models: <b>'+s.kpi.bom+'</b>';
+      tip.hidden=false;const px=X(i)*r.width/W;tip.style.left=Math.min(px+12,r.width-tip.offsetWidth-4)+'px';tip.style.top='8px'});
+    $('trendHit').addEventListener('mouseleave',hide);
+  }
+  function renderSnaps(){
+    const cur=[...SNAPS].reverse().find(s=>s.taken_at<=((CUR_META.restored_from&&CUR_META.restored_from.taken_at)||CUR_META.updated_at||''));
+    $('snapBody').innerHTML=SNAPS.length?[...SNAPS].reverse().map(s=>{const k=s.kpi;
+      const tag=(window.VIEWING&&window.VIEWING.id===s.id)?'<span class="rowtag view">on screen</span>':(cur&&cur.id===s.id&&!window.VIEWING?'<span class="rowtag">current</span>':'');
+      return '<tr><td><b>'+esc(day(s.taken_at).full)+'</b>'+tag+'</td><td>'+k.bom+'</td><td>'+k.onTime+'</td><td>'+k.sopIssue+'</td><td>'+k.hqDelay+'</td><td>'+k.seegDelay+'</td><td>'+(s.warnings||'—')+'</td>'
+        +'<td class="files">'+s.files.map(f=>esc(f.name)).join('<br>')+'</td>'
+        +'<td><button class="hbtn" data-act="view" data-id="'+s.id+'">View</button><button class="hbtn" data-act="restore" data-id="'+s.id+'">Make current</button><button class="hbtn danger" data-act="delete" data-id="'+s.id+'">Delete</button></td></tr>'}).join('')
+      :'<tr><td colspan="9" class="small">Nothing stored yet - every successful refresh will appear here.</td></tr>';
+  }
+  function fillCompare(){
+    const opts=[...SNAPS].reverse().map(s=>'<option value="'+s.id+'">'+esc(day(s.taken_at).full)+'</option>').join('');
+    const f=$('cmpFrom').value,t=$('cmpTo').value;$('cmpFrom').innerHTML=opts;$('cmpTo').innerHTML=opts;
+    const has=v=>SNAPS.some(s=>String(s.id)===v);
+    $('cmpTo').value=has(t)?t:(SNAPS.length?String(SNAPS[SNAPS.length-1].id):'');
+    $('cmpFrom').value=has(f)?f:(SNAPS.length>1?String(SNAPS[SNAPS.length-2].id):'');
+  }
+  async function loadChanges(){
+    if(SNAPS.length<2){CHG=null;$('chgChips').innerHTML='';$('chgBody').innerHTML='<tr><td colspan="6" class="small">Changes appear after the second refresh.</td></tr>';$('chgInfo').textContent='';return}
+    try{CHG=await E.api('/api/changes?from='+encodeURIComponent($('cmpFrom').value)+'&to='+encodeURIComponent($('cmpTo').value))}catch(e){CHG=null;$('chgInfo').textContent=e.message;return}
+    renderChanges();
+  }
+  function changeRows(){
+    if(!CHG)return [];
+    const rows=[...CHG.added.map(r=>({model:r.model,project:r.project,label:'New in the BOM plan',old:'',new:'MP '+(r.mp||'—')+' · LOCAL '+(r.bomLocal||'—'),slip:null,kind:'added'})),
+      ...CHG.removed.map(r=>({model:r.model,project:r.project,label:'No longer in the BOM plan',old:'MP '+(r.mp||'—')+' · LOCAL '+(r.bomLocal||'—'),new:'',slip:null,kind:'removed'})),
+      ...CHG.changed.map(c=>({model:c.model,project:c.project,label:c.label,old:c.old,new:c.new,slip:c.slip,kind:c.slip>0?'later':c.slip<0?'earlier':(/Status$/.test(c.field)?'status':'other')}))];
+    return rows;
+  }
+  function renderChanges(){
+    const all=changeRows(),n=k=>all.filter(r=>r.kind===k).length;
+    const chips=[['all','All changes',all.length],['added','New models',n('added')],['removed','Removed',n('removed')],['later','Moved later',n('later')],['earlier','Moved earlier',n('earlier')],['status','Status changed',n('status')]];
+    if(!chips.some(c=>c[0]===chgFilter))chgFilter='all';
+    $('chgChips').innerHTML=chips.map(([k,l,c])=>'<button type="button" data-k="'+k+'" class="'+(k===chgFilter?'active':'')+'">'+l+' <b>'+c+'</b></button>').join('');
+    const rows=chgFilter==='all'?all:all.filter(r=>r.kind===chgFilter),LIM=400;
+    $('chgBody').innerHTML=rows.length?rows.slice(0,LIM).map(r=>'<tr><td>'+mlink(r.model)+'</td><td>'+val(r.project)+'</td><td>'+esc(r.label)+'</td><td>'+val(r.old)+'</td><td>'+val(r.new)+'</td><td>'
+      +(r.slip?'<span class="'+(r.slip>0?'slip-up':'slip-down')+'">'+(r.slip>0?'+':'−')+Math.abs(r.slip)+' w</span>':'—')+'</td></tr>').join('')
+      :'<tr><td colspan="6" class="small">No changes of this kind between these two refreshes.</td></tr>';
+    $('chgInfo').textContent=rows.length>LIM?'Showing the first '+LIM+' of '+rows.length+' - use Export CSV for all.':(CHG&&CHG.from?'From '+day(CHG.from.taken_at).full+' to '+day(CHG.to.taken_at).full+'.':'');
+  }
+  $('chgChips').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(b){chgFilter=b.dataset.k;renderChanges()}});
+  $('cmpFrom').addEventListener('change',loadChanges);$('cmpTo').addEventListener('change',loadChanges);
+  $('exportChanges').addEventListener('click',()=>{const rows=changeRows().filter(r=>chgFilter==='all'||r.kind===chgFilter);
+    downloadCSV(rows.map(r=>Object.assign({},r,{slip:r.slip??''})),['model','project','label','old','new','slip'],'BOM_changes.csv')});
+
+  async function viewSnapshot(id){
+    try{const d=await E.api('/api/history/'+id);window.VIEWING={id:d.meta.snapshot_id,taken_at:d.meta.updated_at};E.applyData(d);
+      E.setStatus('Showing the refresh of '+day(d.meta.updated_at).full+' (read only)');show('dashboard')}
+    catch(e){alert('Could not open that refresh: '+e.message)}
+  }
+  async function backToCurrent(){window.VIEWING=null;try{const d=await E.api('/api/data');E.applyData(d);E.setStatus('System ready · data from local database')}catch(e){$('viewingBanner').hidden=true;BOM_DATA=[];MASTER_DATA.length=0;renderAll();loadHistory()}}
+  $('backToCurrent').addEventListener('click',backToCurrent);
+  $('snapBody').addEventListener('click',async e=>{
+    const b=e.target.closest('button[data-act]');if(!b)return;const id=+b.dataset.id,s=SNAPS.find(x=>x.id===id),when=s?day(s.taken_at).full:'';
+    if(b.dataset.act==='view')return viewSnapshot(id);
+    if(b.dataset.act==='restore'){
+      if(!confirm('Make the data of '+when+' the current data again?\n\nUse this if the last refresh was made with wrong files. Nothing is deleted - the history keeps every refresh.'))return;
+      try{await E.api('/api/history/'+id+'/restore',{method:'POST'});window.VIEWING=null;E.applyData(await E.api('/api/data'));E.setStatus('The data of '+when+' is current again')}
+      catch(err){alert('Could not restore: '+err.message)}
+    }else if(b.dataset.act==='delete'){
+      if(!confirm('Delete the refresh of '+when+' from the history?\n\nThis cannot be undone. The data currently shown on the dashboard is not changed.'))return;
+      try{await E.api('/api/history/'+id+'/delete',{method:'POST'});delete PREV_CACHE[id];if(window.VIEWING&&window.VIEWING.id===id)await backToCurrent();else await loadHistory()}
+      catch(err){alert('Could not delete: '+err.message)}
+    }
+  });
+
+  window.onDataApplied=function(d){
+    CUR_META=(d&&d.meta)||{};
+    const v=window.VIEWING;$('viewingBanner').hidden=!v;
+    if(v)$('viewingText').textContent='You are looking at the data of '+day(v.taken_at).full+' from the history (read only).';
+    loadHistory();
+  };
+  if(!E.served){$('histUnavailable').classList.add('show');renderTrend();renderSnaps()}
+  let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(SNAPS.length)renderTrend()},200)});
+  const _show=window.show;window.show=function(tab){_show(tab);if(tab==='history'&&SNAPS.length)renderTrend()};
+  renderDashboard();
 })();
 </script>
 
