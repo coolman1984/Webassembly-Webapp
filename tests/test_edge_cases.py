@@ -66,17 +66,35 @@ class TestBaseline(Base):
         m = {r["model"]: r for r in master}
         self.assertEqual((m["TV-A1"]["project"], m["TV-A1"]["projectName"], m["TV-A1"]["inch"], m["TV-A1"]["version"]),
                          ("MKT-A", "Name A", "50", 202638))
-        d4 = m["TV-D4"]                                           # SOP-only: SOP attributes, '-' project kept, float inch
+        d4 = m["TV-D4"]                                           # SOP-only: SOP attributes, '-' project = unknown, 65.0 -> '65'
         self.assertEqual((d4["project"], d4["inch"], d4["mp"], d4["hqTarget"], d4["bomHQ"], d4["hqStatus"], d4["firstSop"]),
-                         ("-", "65.0", "W50 / 2026", "W37 / 2026", "—", "N/A", "—"))
+                         ("", "65", "W50 / 2026", "W37 / 2026", "—", "N/A", "—"))
         c3 = m["TV-C3"]
         self.assertEqual((c3["version"], c3["mp"], c3["inch"], c3["projectName"]), ("", "—", "", ""))
 
     def test_no_false_alarms(self):
-        """Clean data must produce only the one legitimate note (TV-F6 has no SOP rows)."""
+        """Clean data must produce only the two legitimate notes: TV-F6 has no SOP rows, and 4 models have a
+        New Model MP date (W41) that differs from their SOP MP week."""
         ext, _, _ = process(make())
-        self.assertEqual(len(ext["warnings"]), 1, ext["warnings"])
+        self.assertEqual(len(ext["warnings"]), 2, ext["warnings"])
         self.assertIn("no rows in the SOP sheet", ext["warnings"][0])
+        self.assertIn("4 BOM models have a different 1st MP week", ext["warnings"][1])
+
+    def test_logic_fields(self):
+        """Machine-readable fields, New Model 'Actual' rows and cross-file checks."""
+        _, bom, master = process(make())
+        b = {r["model"]: r for r in bom}
+        a1, b2, f6, h8 = b["TV-A1"], b["TV-B2"], b["TV-F6"], b["TV-H8"]
+        self.assertEqual((a1["mpIso"], a1["localTargetIso"], a1["bomLocalIso"], a1["gapWeeks"], a1["sopIssue"]),
+                         ("2026-10-12", "2026-07-20", "2026-07-27", 12, False))
+        self.assertEqual((b2["gapWeeks"], b2["sopIssue"], b2["bomLocalIso"]), (10, True, None))
+        self.assertEqual((a1["mpFrom"], a1["nmMpIso"], a1["mpMismatch"]), ("ship", "2026-10-05", 1))
+        self.assertEqual((f6["mpFrom"], f6["mpMismatch"]), ("newmodel", None))     # MP from New Model: nothing to compare
+        self.assertEqual(h8["mpMismatch"], 13)                                     # W01/2027 vs W41/2026 across the year end
+        self.assertEqual((a1["localActual"], a1["localConfirmed"], a1["hqConfirmed"]), ("OK", True, True))
+        self.assertFalse(any(r["hqAfterLocal"] for r in bom))
+        m = {r["model"]: r for r in master}
+        self.assertEqual((m["TV-A1"]["localConfirmed"], m["TV-D4"]["localConfirmed"], m["TV-D4"]["mpFrom"]), (True, False, "ship"))
 
     def test_any_slot_order(self):
         for order in (("dash", "sop", "nm"), ("sop", "nm", "dash")):

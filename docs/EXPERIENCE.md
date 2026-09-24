@@ -112,3 +112,23 @@ Summary, in the order found:
   the project's time constraints. If the skill's triggering or content quality ever needs tuning, that fuller
   process (trigger-phrase evals, blind comparison) is documented in the skill-creator skill itself and can be
   run at that point.
+
+## 7. Logic review and v3 improvements (2026-09-24)
+
+A review of the dashboard logic against the real database found display bugs that had survived because the
+numbers themselves matched the original:
+
+- The status donut drew "In progress"/"Planned" as hard-coded 0 while painting the remaining ~30% in the Planned
+  colour; the issue donut summed overlapping categories (65+112+112 "issue checks") and let the last segment fill
+  to 360 degrees. Both donuts are now exclusive partitions of the scope.
+- The planning week (W37) and sidebar date were hard-coded; they now follow the PC clock.
+- `EARLIER` confirmations were counted as neither on time nor late; they now count as on time.
+- The New Model `Actual` rows were counted but never read; they now drive the *Confirmed* progress state.
+- 110 of the 112 late models in the real data are late *only* because the SOP's first MP week is earlier than the
+  New Model file's SET PLANT MP (delay = pull-in, exactly). The page now reports this cause separately.
+  Worth confirming with the planners whether the first week with qty>0 in the SOP is always the real MP (small
+  pilot quantities would pull it forward).
+
+The database became schema 3 (ISO date fields, booleans, refresh history, per-refresh change log). `run.migrate`
+rebuilds a schema-2 database from the raw tables it already stored, so an upgrade never needs the Excel files.
+`tests/test_logic.py` covers the rules and the database without Excel.

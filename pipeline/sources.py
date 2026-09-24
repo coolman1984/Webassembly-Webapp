@@ -257,6 +257,7 @@ def _nm_date(v, date1904: bool):
 def extract_newmodel(ws, det: Detected, date1904: bool = False) -> dict:
     c = det.columns
     plan, actual_rows, other_types = [], 0, Counter()
+    actual: dict[str, dict] = {}                 # model -> the first 'Actual' row's BOM HQ / LOCAL cells
     for start, chunk in X.iter_used_range(ws):
         for k, r in enumerate(chunk):
             if start + k <= det.header_row + 1:
@@ -276,9 +277,13 @@ def extract_newmodel(ws, det: Detected, date1904: bool = False) -> dict:
                 })
             elif t == "actual":
                 actual_rows += 1
+                if model not in actual:
+                    actual[model] = {"bom_hq": _nm_date(X.clean_cell(r[c["bom_hq"]]), date1904),
+                                     "bom_local": _nm_date(X.clean_cell(r[c["bom_local"]]), date1904)}
             else:
                 other_types[t or "(blank)"] += 1
-    return {"plan": plan, "actual_rows": actual_rows, "other_types": dict(other_types), "date1904": date1904}
+    return {"plan": plan, "actual": actual, "actual_rows": actual_rows, "other_types": dict(other_types),
+            "date1904": date1904}
 
 
 def extract_sop(ws, det: Detected, date1904: bool = False) -> dict:

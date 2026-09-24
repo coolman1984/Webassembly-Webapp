@@ -336,6 +336,10 @@ def main() -> int:
     os.makedirs(INBOX_DIR, exist_ok=True)
     shutil.rmtree(UPLOAD_DIR, ignore_errors=True)
     shutil.rmtree(RUN_DIR, ignore_errors=True)
+    try:
+        P.migrate(DB_PATH, _log)                   # a database from an older version keeps working after an upgrade
+    except Exception:
+        _log("Database upgrade failed (the data can still be refreshed from Excel):\n" + traceback.format_exc())
     _load_cache()
     with open(os.path.join(DATA_DIR, "port.txt"), "w") as f:
         f.write(str(PORT))

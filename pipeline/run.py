@@ -167,25 +167,35 @@ def build_datasets(ext: dict, max_version: Optional[int] = None) -> tuple[list[d
     sop_sum = T.summarise_sop(ext["sop"], max_version)
     bom, bstats = T.build_bom(ext["nm"], sop_sum)
     master = T.build_master(ext["dash"], ext["sop"], sop_sum, bom)
-    versions = sorted({k[2] for k in ext["sop"]["agg"]})
+    versions = sorted({k[2] for k in ext["sop"]["agg"] if max_version is None or k[2] <= max_version})
     report = {
         "bom_models": len(bom), "master_models": len(master), "bom_stats": bstats,
-        "sop_versions": [versions[0], versions[-1]], "sop_items": len(sop_sum),
-        "sop_rows": ext["sop"]["rows_read"], "dash_rows": ext["dash"]["rows_read"],
+        "sop_versions": [versions[0], versions[-1]] if versions else [None, None], "sop_items": len(sop_sum),
+        "sop_rows": ext["sop"]["rows_read"], "dash_rows": ext["dash"]["rows_read"], "kpis": T.kpis(bom),
     }
-    if bstats["mp_bad_week"]:
-        ext["warnings"].append(f"{bstats['mp_bad_week']} BOM models have an MP week that is not a real ISO week; "
-                               "their MP was taken from the New Model file instead.")
+    _logic_checks(ext["warnings"], bstats, ext["nm"])
     return bom, master, report
 
 
-def _previous_counts(db_path: str) -> Optional[tuple[int, int]]:
-    from . import store
-    try:
-        d = store.read_datasets(db_path)
-        return len(d["bom"]), len(d["master"])
-    except Exception:
-        return None
+def _logic_checks(w: list[str], bstats: dict, nm: dict) -> None:
+    """Business-logic consistency notes (the data is still loaded; these point at rows worth a look)."""
+    if bstats["mp_bad_week"]:
+        w.append(f"{bstats['mp_bad_week']} BOM models have an MP week that is not a real ISO week; "
+                 "their MP was taken from the New Model file instead.")
+    if bstats["mp_mismatch"]:
+        w.append(f"{bstats['mp_mismatch']} BOM models have a different 1st MP week in the SOP sheet than the New Model "
+                 "file's SET PLANT MP date (the SOP week is used). Filter 'MP mismatch' to review them.")
+    if bstats["hq_after_local"]:
+        w.append(f"{bstats['hq_after_local']} BOM models have the HQ BOM planned after the LOCAL BOM "
+                 "(HQ is due first: MP-13W vs MP-12W). Filter 'HQ after LOCAL' to review them.")
+    if bstats["mp_missing"]:
+        w.append(f"{bstats['mp_missing']} BOM models have no MP week at all (not in the SOP and no New Model MP date); "
+                 "their targets and status cannot be computed.")
+    if bstats["actual_other_text"]:
+        w.append(f"New Model: {bstats['actual_other_text']} 'Actual' BOM cells hold text that is neither a date nor a "
+                 "confirmation mark (OK/Done/Y) - shown as-is, not counted as confirmed.")
+    if nm.get("actual_rows") and not (bstats["hq_confirmed"] or bstats["local_confirmed"] or bstats["actual_other_text"]):
+        w.append("New Model: the 'Actual' rows are all empty - confirmation progress is tracked against the plan only.")
 
 
 def process(paths: list[str], db_path: str, log: Callable[[str], None] = print, pidfile: Optional[str] = None,
@@ -193,15 +203,72 @@ def process(paths: list[str], db_path: str, log: Callable[[str], None] = print, 
     from . import store
     ext = extract_all(paths, log, pidfile, timeout_s)
     bom, master, report = build_datasets(ext)
-    prev = _previous_counts(db_path)
-    if prev:
-        for label, old, new in (("BOM", prev[0], len(bom)), ("All Models", prev[1], len(master))):
+    previous = store.read_previous(db_path)
+    if previous["bom"] is not None:
+        old_master = previous["history"][-1].get("master_models") if previous["history"] else None
+        for label, old, new in (("BOM", len(previous["bom"]), len(bom)), ("All Models", old_master, len(master))):
             if old and new < old * (1 - DROP_WARN_RATIO):
                 ext["warnings"].append(f"{label} dropped from {old} to {new} models - please check the files are the right ones.")
+    changes = T.diff_bom(previous["bom"], bom)
+    if changes:
+        n_models = len({c["model"] for c in changes})
+        log(f"{n_models} BOM models changed since the previous refresh")
     log("Writing local database ...")
-    meta = store.write_db(db_path, ext, bom, master, report)
+    meta = store.write_db(db_path, ext, bom, master, report, previous, changes)
     log(f"Done: {len(bom)} BOM models, {len(master)} total models")
     return meta
+
+
+def migrate(db_path: str, log: Callable[[str], None] = print) -> bool:
+    """Upgrade a database written by an older version (schema 2) to the current schema WITHOUT the Excel files:
+    everything the calculations need is already stored in it (New Model plan rows, SOP item summary, DASH rows).
+    Only the New Model 'Actual' cells are unknown until the next refresh. Returns True when a migration ran."""
+    import json
+    import sqlite3
+    from . import store
+    if not os.path.isfile(db_path):
+        return False
+    try:
+        con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        try:
+            meta = {k: json.loads(v) for k, v in con.execute("SELECT key, value FROM meta")}
+            if meta.get("schema_version") != 2:
+                return False
+            num = lambda v: float(v) if isinstance(v, str) and re.fullmatch(r"\d+(\.\d+)?", v.strip()) else v
+            plan = [{"model": m, "project": p or "", "inch": i or "", "bom_hq": num(h), "bom_local": num(lo), "mp": num(mp)}
+                    for m, p, i, h, lo, mp in con.execute("SELECT model, project, inch, bom_hq, bom_local, mp FROM newmodel_plan")]
+            sop_rows = con.execute("SELECT item, version, first_sop_version, mp_week, mp_from, has_qty, project, inch FROM sop_item").fetchall()
+            qty_rows = con.execute("SELECT item, cate, version, total_qty, first_pos_week FROM sop_qty").fetchall()
+            dash_rows = [{"model": m, "project": p or "", "projectName": n or "", "raw": json.loads(r or "{}")}
+                         for m, p, n, r in con.execute("SELECT model, project, project_name, raw_json FROM dash")]
+            files = [dict(zip(("role", "name", "sheet", "size", "sha256"), r)) for r in con.execute("SELECT * FROM source_files")]
+        finally:
+            con.close()
+    except (sqlite3.Error, ValueError) as e:
+        log(f"Old database could not be migrated ({e}); refresh the data.")
+        return False
+    sop_sum = {i: {"version": v, "first_sop_version": f, "mp_code": w, "mp_from": mf, "has_qty": bool(h)}
+               for i, v, f, w, mf, h, _, _ in sop_rows}
+    dims = {i: {"project": p or "", "inch": inch or "", "any_project": p or "", "any_inch": inch or ""}
+            for i, _, _, _, _, _, p, inch in sop_rows}
+    nm = {"plan": plan, "actual": {}, "actual_rows": 0}
+    bom, bstats = T.build_bom(nm, sop_sum)
+    master = T.build_master({"rows": dash_rows}, {"dims": dims}, sop_sum, bom)
+    report = dict(meta.get("report") or {}, bom_models=len(bom), master_models=len(master), bom_stats=bstats, kpis=T.kpis(bom))
+    warnings = list(meta.get("warnings") or [])
+    _logic_checks(warnings, bstats, nm)
+    warnings.append("Upgraded from the previous program version without re-reading Excel; New Model 'Actual' "
+                    "confirmations appear after the next data refresh.")
+    ext = {"files": files, "dash": {"rows": dash_rows}, "nm": nm, "warnings": warnings,
+           "seconds": meta.get("extract_seconds", 0)}
+    import shutil
+    shutil.copy2(db_path, db_path + ".schema2.bak")   # the old file stays available if anything looks wrong
+    previous = store.read_previous(db_path)
+    previous["bom"] = None                       # a migration is not a data change - no change list, no drop warning
+    store.write_db(db_path, ext, bom, master, report, previous, [], sop_tables=(sop_rows, qty_rows),
+                   updated_at=meta.get("updated_at"))
+    log(f"Database upgraded to schema {store.SCHEMA_VERSION}: {len(bom)} BOM models, {len(master)} total models")
+    return True
 
 
 def _pick_from_dir(d: str) -> list[str]:

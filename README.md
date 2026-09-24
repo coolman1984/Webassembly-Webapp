@@ -58,15 +58,39 @@ Join key = model code (trimmed, upper-case, invisible characters removed, numeri
 ## Calculation rules (verified against the original data by `verify.py`)
 * `version` latest SOP version of the item; `firstSop` earliest version with Cate `SOP`.
 * `mp` first *week* (chronological, regardless of column order) with qty>0 in the latest `Ship` version; else the latest `SOP`
-  version; else the New Model `MP` date.
-* `hqTarget` = MP - 13 weeks, `localTarget` = MP - 12 weeks (ISO weeks, Monday dates).
+  version; else the New Model `MP` date. `mpFrom` records which one was used.
+* `hqTarget` = MP - 13 weeks, `localTarget` = MP - 12 weeks (ISO weeks, Monday dates). The week counts live in
+  `pipeline/transform.py` (`HQ_WEEKS`, `LOCAL_WEEKS`, `SOP_LEAD_WEEKS`) and the page reads them from the data.
 * `hq/localStatus` MATCH / LATER / EARLIER from the week difference between BOM plan and target; N/A without a date.
-* `firstAppearMpGap` = weeks from the `firstSop` version week to the MP week (BOM models only).
+* `firstAppearMpGap` = weeks from the `firstSop` version week to the MP week (BOM models only); **SOP issue** when < 12.
 * All Models scope: DASH models + SOP models with qty>0 in any version + BOM models.
+* Inch is normalised (`43`, `43.0` -> `43`); `-` is treated as "unknown" for project and inch.
+
+## Dashboard logic
+* **On time** = LOCAL BOM planned no later than the target week (MATCH *or* EARLIER). *Late* = LATER. The timing donut is
+  exclusive (on time + late + no plan = scope).
+* **Planning week** = the ISO week of today's date (no longer a hard-coded label).
+* **Progress** of each BOM model (exclusive): *Confirmed* (the New Model `Actual` row holds a date or OK/Done/Y),
+  *Plan passed* (plan week before this week, not confirmed), *This week*, *Upcoming*, *No plan*.
+* **Delay cause**: a late model whose delay is fully explained by the SOP having moved MP earlier than the New Model file's
+  `SET PLANT MP` is marked *MP pull-in*; the rest are late BOM plans.
+* **Data & logic checks**: MP mismatch between SOP and New Model, HQ BOM planned after LOCAL BOM, missing plan/MP,
+  plan weeks passed, due within 4 weeks. Every check, KPI card, timeline bar and project row opens the matching model list.
+* Tables: click a header to sort, chips for quick filters, 35/100/250 rows per page, click a row for a detail panel that
+  explains the calculation. CSV export includes every field, opens correctly in Excel (UTF-8 BOM) and neutralises formulas.
+
+## Database (`data\dashboard.db`, schema 3)
+* Datasets: `bom_data`, `master_data` (+ raw source tables `dash`, `newmodel_plan` incl. Actual cells, `sop_item`, `sop_qty`).
+* `refresh_history`: headline KPIs of every refresh (kept across refreshes, last 200) - shown on the Update Data page and as
+  the on-time trend.
+* `bom_changes`: model-level changes between consecutive refreshes (added / removed / MP, plan, status, actual changed) -
+  shown as "Since last refresh" and the *Changed* filter.
+* A schema-2 database from the previous version is upgraded automatically at start-up without needing Excel.
 
 ## Tests (maintainers)
 ```
-runtime\python.exe -I tests\test_edge_cases.py -v   # 25 edge cases incl. fuzzed storage variants (real Excel)
+runtime\python.exe -I tests\test_logic.py -v        # rules, change tracking, history, migration (no Excel, seconds)
+runtime\python.exe -I tests\test_edge_cases.py -v   # edge cases incl. fuzzed storage variants (real Excel)
 runtime\python.exe -I tests\test_service.py -v      # security, hostile uploads, concurrency, crash recovery, ports
 runtime\python.exe -I tests\test_stress.py -v       # 500k-row SOP, 60k models, Excel's 1,048,576-row limit
 python tests\test_browser.py                        # 300k-row page, hostile strings, CSV injection (needs Playwright)
@@ -75,7 +99,7 @@ runtime\python.exe -I verify.py FILE FILE FILE      # equality with the original
 
 ## Limits
 * Needs desktop Excel (COM). Without it the page says so and keeps the old data.
-* Static labels not driven by Excel (unchanged from the original): sidebar date, "Current planning week".
+* The planning week follows the PC clock.
 * The dashboard's table columns are fixed; a new Excel column is ignored unless the page is extended.
 
 ## Further reading

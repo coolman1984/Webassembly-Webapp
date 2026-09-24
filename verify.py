@@ -17,6 +17,7 @@ import sys
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 from pipeline import run  # noqa: E402
+from pipeline import transform as T  # noqa: E402
 
 ORIGINAL = os.path.join(ROOT, "backup", "BOM_Confirmation_Plan_SYSTEM_STATUS_FONT_MATCH.original.html")
 
@@ -25,6 +26,23 @@ def load_embedded() -> tuple[list[dict], list[dict]]:
     lines = open(ORIGINAL, encoding="utf-8").read().split("\n")
     pick = lambda name: json.loads(re.match(rf"let {name}=(.*);\s*$", next(l for l in lines if l.startswith(f"let {name}="))).group(1))
     return pick("BOM_DATA"), pick("MASTER_DATA")
+
+
+def normalise(r: dict) -> dict:
+    """The original data showed SOP inches as '43.0' and '-' as a project; both are normalised now
+    ('43', ''). Apply the same normalisation to the original before comparing."""
+    r = dict(r)
+    if "inch" in r:
+        r["inch"] = T.norm_inch(r["inch"])
+    if "project" in r:
+        r["project"] = T.norm_project(r["project"])
+    return r
+
+
+def same(orig: dict, new: dict) -> list[str]:
+    """Keys of the original row whose value differs (new rows carry extra fields, which are ignored)."""
+    o = normalise(orig)
+    return [k for k in o if o[k] != new.get(k)]
 
 
 def gap(s):
@@ -53,7 +71,7 @@ def main() -> int:
     bad = 0
     eb = {r["model"]: r for r in emb_bom}
     mb = {r["model"]: r for r in bom}
-    d = [m for m in eb if m not in mb or eb[m] != mb[m]]
+    d = [m for m in eb if m not in mb or same(eb[m], mb[m])]
     print(f"\nBOM_DATA     : {len(mb)} rebuilt vs {len(eb)} original -> {len(d)} differing rows, {len(set(mb) ^ set(eb))} membership differences")
     bad += len(d) + len(set(mb) ^ set(eb))
 
@@ -61,17 +79,20 @@ def main() -> int:
     mm = {r["model"]: r for r in master}
     lost = set(em) - set(mm)
     new_scope = [m for m in set(mm) - set(em)]
-    explained = {"new SOP-scope rows": 0, "DASH row now in SOP scope": 0, "SOP rows only after the snapshot": 0}
+    explained = {"new SOP-scope rows": 0, "DASH row now in SOP scope": 0, "SOP rows only after the snapshot": 0,
+                 "blank DASH project now filled from BOM/SOP": 0}
     unexplained = []
     for m, e in em.items():
         r = mm.get(m)
-        if r is None or r == e:
+        keys = same(e, r) if r is not None else []
+        if not keys:
             continue
-        keys = [k for k in e if e[k] != r.get(k)]
         if "SOP" not in e["coverage"] and "SOP" in r["coverage"]:
             explained["DASH row now in SOP scope"] += 1            # scope decision: any qty > 0 in any version
         elif keys == ["inch"] and sop_min.get(m, 0) > a.cap:
             explained["SOP rows only after the snapshot"] += 1     # item first appears in a newer SOP version
+        elif keys == ["project"] and not T.norm_project(e["project"]):
+            explained["blank DASH project now filled from BOM/SOP"] += 1
         else:
             unexplained.append((m, keys))
     explained["new SOP-scope rows"] = len(new_scope)

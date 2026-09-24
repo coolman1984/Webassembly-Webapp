@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BOM Confirmation Plan | Fixed Dashboard</title>
+<title>BOM Confirmation Plan</title>
 <style>
 :root{--navy:#0b2340;--blue:#236fa6;--cyan:#1da6bb;--green:#1f8b73;--amber:#c79225;--red:#c65048;--ink:#17324b;--muted:#74879a;--line:#dce6ee;--bg:#f4f7fa;--card:#fff;--shadow:0 12px 30px rgba(17,47,75,.07)}
 *{box-sizing:border-box}html,body{margin:0;padding:0;background:linear-gradient(180deg,#f8fafc,#f1f5f8);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif}body{font-size:13px}
@@ -242,41 +242,111 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
   font-variant-numeric:tabular-nums!important;
 }
 </style>
+<style id="v3-additions">
+/* ---- v3: header/update hero (classes existed without styles) */
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:14px;padding:4px 2px 12px;border-bottom:1px solid #e2e9ef}
+.kicker{font-size:9px;letter-spacing:.15em;text-transform:uppercase;font-weight:950;color:#1d9db4}
+.hero h2{margin:5px 0 4px;font-size:22px;letter-spacing:-.02em;color:#153a58}.hero p{margin:0;font-size:10.5px;color:#74879a;max-width:640px;line-height:1.5}
+.week{border:1px solid #dce8ee;background:#fff;border-radius:12px;padding:9px 13px;text-align:right;box-shadow:0 6px 16px rgba(17,47,75,.05)}
+.week span{display:block;font-size:8px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;color:#8192a3}.week b{font-size:17px;color:#153a58}
+/* ---- topbar extras */
+.filters .wkchip{margin-left:auto;font-size:9px;font-weight:900;letter-spacing:.06em;color:#4f7289;background:#eef5f8;border:1px solid #dce8ee;border-radius:999px;padding:7px 10px;white-space:nowrap}
+.filters select{max-width:190px}
+/* ---- dashboard rows 3/4 */
+.v3-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.v3-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(17,47,75,.05);padding:12px 16px 14px;min-width:0}
+.v3-card .v28-charthead{margin-bottom:10px}
+.tl{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:128px;padding-top:6px}
+.tl-col{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;cursor:pointer;min-width:0}
+.tl-col:hover .tl-stack{filter:brightness(.93)}
+.tl-n{font-size:9px;font-weight:950;color:#173a58;font-variant-numeric:tabular-nums}
+.tl-stack{width:100%;max-width:34px;display:flex;flex-direction:column-reverse;border-radius:5px 5px 2px 2px;overflow:hidden;background:#edf2f5;min-height:2px}
+.tl-stack i{display:block;width:100%}
+.tl-lab{font-size:8px;font-weight:850;color:#7b8d9d;white-space:nowrap}.tl-col.cur .tl-lab{color:#0f6f85;font-weight:950}
+.tl-col.cur .tl-stack{outline:2px solid rgba(29,166,187,.35);outline-offset:2px}
+.mini-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:8.5px;color:#788b9d;font-weight:800}.mini-legend span{display:flex;align-items:center;gap:5px}
+.ptable{width:100%;min-width:0;border-collapse:collapse}.ptable th,.ptable td{position:static;padding:6px 7px;border-right:0;font-size:9.5px}.ptable th{font-size:8px;background:#f6f9fb}
+.ptable td:first-child,.ptable th:first-child{position:static;box-shadow:none}.ptable tbody tr{cursor:pointer}.ptable td.num,.ptable th.num{text-align:right;font-variant-numeric:tabular-nums}
+.pbar{display:inline-block;width:54px;height:6px;border-radius:999px;background:#edf2f5;vertical-align:middle;margin-right:6px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--green)}
+.ptwrap{max-height:236px;overflow:auto}
+.checks{display:grid;gap:7px}.check{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border:1px solid #e3eaf0;border-radius:10px;padding:8px 10px}
+.check b{font-size:18px;color:#173954;font-variant-numeric:tabular-nums}.check .ct{font-size:9.5px;font-weight:900;color:#39536b}.check .cd{font-size:8.5px;color:#7b8d9d;margin-top:2px;line-height:1.35}
+.check.warn{border-left:4px solid var(--amber)}.check.info{border-left:4px solid #7e9aae}.check.ok{border-left:4px solid var(--green)}
+.chg{display:grid;gap:5px;max-height:190px;overflow:auto}.chg div{display:flex;gap:8px;align-items:baseline;font-size:9.5px;color:#304a62;border-bottom:1px solid #eef2f5;padding:4px 0}
+.chg .k{font-size:7.5px;font-weight:950;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:2px 6px;flex:0 0 auto}
+.k.added{background:#eaf7f3;color:#16836e}.k.removed{background:#fff0ee;color:#b1443c}.k.changed{background:#eef5f8;color:#2d5876}
+.chg .m{font-weight:900;color:#173a58;cursor:pointer}.chg .m:hover{text-decoration:underline}
+.spark{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:9px;color:#7b8d9d}.spark svg{flex:0 0 auto}
+.empty{font-size:9.5px;color:#8a99a7;padding:10px 2px}
+.cause{font-size:8.5px;color:#7b8d9d;margin-top:4px}.cause strong{color:#a87312}
+/* ---- table toolbar, chips, sorting */
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:9px 15px;border-bottom:1px solid #e7edf2;background:#fbfcfd}
+.chip{border:1px solid #d8e2ea;background:#fff;color:#36566e;border-radius:999px;padding:5px 9px;font-size:8.5px;font-weight:900;cursor:pointer;white-space:nowrap}
+.chip b{font-variant-numeric:tabular-nums;color:#173a58;margin-left:3px}.chip.on{background:#173f62;border-color:#173f62;color:#fff}.chip.on b{color:#fff}
+.chip:disabled{opacity:.45;cursor:default}
+.tabletools{display:flex;gap:8px;align-items:center}.tabletools select{height:28px;border:1px solid #d8e2ea;border-radius:7px;font:inherit;font-size:9px;color:#36566e;background:#fff}
+th.sortable{cursor:pointer;user-select:none}th.sortable:hover{color:#173a58}th .arr{opacity:.35;margin-left:3px}th.sorted .arr{opacity:1;color:#1d9db4}
+tbody tr{cursor:pointer}
+.delta{font-size:8px;color:#8a99a7;margin-left:4px;font-weight:850}
+.phase{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;font-size:8px;font-weight:950;letter-spacing:.04em}
+.ph-done{background:#eaf7f3;color:#16836e}.ph-now{background:#e7f7fa;color:#0f7f93}.ph-next{background:#fff7e6;color:#a87312}.ph-past{background:#fff0ee;color:#b1443c}.ph-noplan{background:#eef2f6;color:#748392}
+.mis{color:#a87312;font-weight:900;font-size:8.5px;margin-left:4px}
+.pager{gap:10px}.pager .pg{display:flex;align-items:center;gap:6px}
+/* ---- detail drawer */
+.drawer-bg{position:fixed;inset:0;background:rgba(7,26,49,.28);z-index:90;display:none}.drawer-bg.open{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:#fff;z-index:91;box-shadow:-20px 0 40px rgba(7,26,49,.18);transform:translateX(105%);transition:transform .2s ease;display:flex;flex-direction:column}
+.drawer.open{transform:none}.drawer header{display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px;border-bottom:1px solid #e7edf2}
+.drawer header h3{margin:4px 0 0;font-size:18px;color:#153a58;word-break:break-all}.drawer .x{border:1px solid #d8e2ea;background:#fff;border-radius:8px;width:30px;height:30px;cursor:pointer;font-weight:900;color:#36566e}
+.drawer .body{overflow:auto;padding:14px 18px 22px}.drawer dl{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;margin:0 0 14px}.drawer dt{font-size:8.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:900;color:#8192a3;padding-top:2px}
+.drawer dd{margin:0;font-size:10.5px;color:#304a62;word-break:break-word}.drawer h4{margin:14px 0 8px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#526b81}
+.explain{border:1px solid #e1e8ee;background:#f8fafc;border-radius:10px;padding:10px 12px;font-size:10px;color:#304a62;line-height:1.55}.explain p{margin:0 0 5px}.explain p:last-child{margin:0}
+/* ---- update tab: current data */
+.datagrid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:14px}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:5px 10px;font-size:10px;color:#304a62}.kv span:nth-child(odd){font-size:8.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:900;color:#8192a3;padding-top:1px}
+.notes{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:6px}.notes li{font-size:9.5px;color:#5b4a1c;background:#fffaf0;border:1px solid #f1e2bf;border-radius:8px;padding:7px 9px;line-height:1.45}
+.notes li.none{color:#16836e;background:#f1faf7;border-color:#cfeadf}
+.hist{width:100%;min-width:0;border-collapse:collapse}.hist th,.hist td{position:static;padding:5px 7px;font-size:9.5px;border-right:0;text-align:right}.hist th:first-child,.hist td:first-child{position:static;text-align:left;box-shadow:none;font-weight:800}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#173f62;color:#fff;border-radius:11px;padding:11px 15px;font-size:11px;font-weight:800;box-shadow:0 12px 30px rgba(7,26,49,.25);transition:all .2s;z-index:120;max-width:min(640px,92vw)}
+.toast.show{opacity:1;transform:translateX(-50%)}.toast.err{background:#a33e37}
+@media(max-width:1000px){.v3-row,.datagrid{grid-template-columns:1fr}}
+@media(max-width:700px){.filters .wkchip{margin-left:0}.drawer dl{grid-template-columns:1fr}.kv{grid-template-columns:1fr}}
+@media print{.side,.topbar,.pager,.chips,.tabletools,.view{display:none!important}.app{display:block}.slide{display:block!important;min-height:0;page-break-after:always}.tablewrap{max-height:none;overflow:visible}}
+</style>
 </head>
 <body>
 <div class="app">
 <aside class="side">
   <div class="brand"><small>BOM CONTROL</small><h1>Confirmation<br>Plan</h1></div>
   <div class="nav"><button class="active" data-tab="dashboard">● <span>Dashboard</span></button><button data-tab="bom">▦ <span>BOM Plan</span></button><button data-tab="update">↑ <span>Update Data</span></button><button data-tab="master">☷ <span>All Models</span></button></div>
-  <div class="sidefoot">08 Sep 2026<br>Offline · self-contained</div>
+  <div class="sidefoot"><span id="sideDate">—</span><br><span id="sideData">No data loaded</span><br>Offline · self-contained</div>
 </aside>
 <div class="main">
-  <div class="topbar"><div class="filters"><div class="label">Global Filter</div><input id="globalSearch" placeholder="Search model / project / inch…"><select id="globalProject"><option value="">All Projects</option></select><button class="reset" id="resetBtn">Reset</button></div></div>
+  <div class="topbar"><div class="filters"><div class="label">Global Filter</div><input id="globalSearch" placeholder="Search model / project / inch…"><select id="globalProject"><option value="">All Projects</option></select><select id="globalInch"><option value="">All Inches</option></select><button class="reset" id="resetBtn">Reset</button><span class="wkchip" id="weekChip" title="Planning week = the ISO week of today's date">Week —</span></div></div>
 
   <section class="slide active" id="dashboard"><div class="content">
-    <div class="dash-top"><div class="dash-brand"><i></i>BOM Confirmation Control</div><div class="dash-meta">Status &amp; Issue Management</div></div>
+    <div class="dash-top"><div class="dash-brand"><i></i>BOM Confirmation Control</div><div class="dash-meta" id="dashMeta">Status &amp; Issue Management</div></div>
 
     <div class="v28-chartgrid">
       <section class="v28-chartcard">
-        <div class="v28-charthead"><div><div class="v28-charttitle">Confirmation Status</div><div class="v28-chartsub">Current confirmation position across the active model scope.</div></div><div class="v28-chartmeta" id="v28StatusTotal">371 models</div></div>
+        <div class="v28-charthead"><div><div class="v28-charttitle">Confirmation Timing</div><div class="v28-chartsub">LOCAL BOM plan against the MP −<span class="rLocal">12</span>W target, active model scope.</div></div><div class="v28-chartmeta" id="v28StatusTotal">0 models</div></div>
         <div class="v28-chartbody">
-          <div class="v28-donut" id="v28StatusDonut"><div class="v28-donutcenter"><b id="v28StatusCenter">371</b><span>Total Models</span></div></div>
+          <div class="v28-donut" id="v28StatusDonut"><div class="v28-donutcenter"><b id="v28StatusCenter">0</b><span>Models</span></div></div>
           <div class="v28-legend">
-            <div class="v28-legrow"><i class="v28-dot" style="background:var(--green)"></i><span class="v28-legname">On Time</span><b class="v28-legcount" id="v28On">259</b><span class="v28-legpct" id="v28OnPct">69.8%</span></div>
-            <div class="v28-legrow"><i class="v28-dot" style="background:var(--cyan)"></i><span class="v28-legname">In Progress</span><b class="v28-legcount" id="v28Prog">0</b><span class="v28-legpct" id="v28ProgPct">0.0%</span></div>
-            <div class="v28-legrow"><i class="v28-dot" style="background:var(--amber)"></i><span class="v28-legname">Planned</span><b class="v28-legcount" id="v28Plan">0</b><span class="v28-legpct" id="v28PlanPct">0.0%</span></div>
+            <div class="v28-legrow"><i class="v28-dot" style="background:var(--green)"></i><span class="v28-legname">On time (≤ target week)</span><b class="v28-legcount" id="v28On">0</b><span class="v28-legpct" id="v28OnPct">0.0%</span></div>
+            <div class="v28-legrow"><i class="v28-dot" style="background:var(--red)"></i><span class="v28-legname">Late (after target)</span><b class="v28-legcount" id="v28Late">0</b><span class="v28-legpct" id="v28LatePct">0.0%</span></div>
+            <div class="v28-legrow"><i class="v28-dot" style="background:#9cafc1"></i><span class="v28-legname">No plan / no MP</span><b class="v28-legcount" id="v28NoPlan">0</b><span class="v28-legpct" id="v28NoPlanPct">0.0%</span></div>
           </div>
         </div>
       </section>
 
       <section class="v28-chartcard">
-        <div class="v28-charthead"><div><div class="v28-charttitle">Issues by Category</div><div class="v28-chartsub">Independent exception checks within the active model scope.</div></div><div class="v28-chartmeta" id="v28IssueTotal">371 models</div></div>
+        <div class="v28-charthead"><div><div class="v28-charttitle">Issues by Category</div><div class="v28-chartsub">Independent checks – one model can have several issues.</div></div><div class="v28-chartmeta" id="v28IssueTotal">0 models</div></div>
         <div class="v28-chartbody">
-          <div class="v28-donut issue" id="v28IssueDonut"><div class="v28-donutcenter"><b id="v28IssueCenter">—</b><span>Issue Checks</span></div></div>
+          <div class="v28-donut issue" id="v28IssueDonut"><div class="v28-donutcenter"><b id="v28IssueCenter">0</b><span>With issues</span></div></div>
           <div class="v28-legend">
-            <div class="v28-legrow"><i class="v28-dot" style="background:var(--red)"></i><span class="v28-legname">SOP Issue</span><b class="v28-legcount" id="v28Sop">65</b><span class="v28-legpct" id="v28SopPct">17.5%</span></div>
-            <div class="v28-legrow"><i class="v28-dot" style="background:var(--amber)"></i><span class="v28-legname">HQ Delay</span><b class="v28-legcount" id="v28Hq">111</b><span class="v28-legpct" id="v28HqPct">29.9%</span></div>
-            <div class="v28-legrow"><i class="v28-dot" style="background:#9cafc1"></i><span class="v28-legname">SEEG Delay</span><b class="v28-legcount" id="v28Seeg">111</b><span class="v28-legpct" id="v28SeegPct">29.9%</span></div>
+            <div class="v28-legrow"><i class="v28-dot" style="background:var(--red)"></i><span class="v28-legname">SOP Issue</span><b class="v28-legcount" id="v28Sop">0</b><span class="v28-legpct" id="v28SopPct">0.0%</span></div>
+            <div class="v28-legrow"><i class="v28-dot" style="background:var(--amber)"></i><span class="v28-legname">HQ Delay</span><b class="v28-legcount" id="v28Hq">0</b><span class="v28-legpct" id="v28HqPct">0.0%</span></div>
+            <div class="v28-legrow"><i class="v28-dot" style="background:#b45e52"></i><span class="v28-legname">SEEG Delay</span><b class="v28-legcount" id="v28Seeg">0</b><span class="v28-legpct" id="v28SeegPct">0.0%</span></div>
           </div>
         </div>
       </section>
@@ -284,15 +354,15 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
 
     <div class="v28-lower">
       <section class="panel">
-        <div class="panelhead"><div><div class="eyebrow">01 · Confirmation status</div><div class="paneltitle">Status</div><div class="panelsub">SEEG / LOCAL confirmation against the 12-week timing rule.</div></div><div class="badge" id="statusScope">371 models</div></div>
+        <div class="panelhead"><div><div class="eyebrow">01 · Confirmation status</div><div class="paneltitle">Status</div><div class="panelsub">SEEG / LOCAL confirmation against the <span class="rLocal">12</span>-week rule and today's planning week.</div></div><div class="badge" id="statusScope">0 models</div></div>
         <div class="panelbody">
           <div class="statgrid">
-            <div class="stat on"><div class="statlabel">Confirmation on time</div><div class="count"><b id="stOn">259</b><span>/ <span id="stOnTotal" class="status-total" class="status-total">371</span></span></div><div class="desc">Confirmation within the 12-week rule</div><div class="status-bar"><span id="stOnFill"></span></div></div>
-            <div class="stat prog"><div class="statlabel">In progress</div><div class="count"><b id="stProg">0</b><span>/ <span id="stProgTotal" class="status-total" class="status-total">371</span></span></div><div class="desc">Confirmation planned in current week</div><div class="status-bar"><span id="stProgFill"></span></div></div>
-            <div class="stat plan"><div class="statlabel">Planned</div><div class="count"><b id="stPlan">0</b><span>/ <span id="stPlanTotal" class="status-total" class="status-total">371</span></span></div><div class="desc">Confirmation planned after current week</div><div class="status-bar"><span id="stPlanFill"></span></div></div>
+            <div class="stat on" data-filter="ontime"><div class="statlabel">Confirmation on time</div><div class="count"><b id="stOn">0</b><span>/ <span id="stOnTotal" class="status-total">0</span></span></div><div class="desc">LOCAL BOM planned no later than MP −<span class="rLocal">12</span>W</div><div class="status-bar"><span id="stOnFill"></span></div></div>
+            <div class="stat prog" data-filter="now"><div class="statlabel">In progress</div><div class="count"><b id="stProg">0</b><span>/ <span id="stProgTotal" class="status-total">0</span></span></div><div class="desc">LOCAL BOM planned in the current week, not yet confirmed</div><div class="status-bar"><span id="stProgFill"></span></div></div>
+            <div class="stat plan" data-filter="next"><div class="statlabel">Planned</div><div class="count"><b id="stPlan">0</b><span>/ <span id="stPlanTotal" class="status-total">0</span></span></div><div class="desc">LOCAL BOM planned after the current week</div><div class="status-bar"><span id="stPlanFill"></span></div></div>
           </div>
-          <div class="mix"><div class="mixhead"><span>Status mix</span><strong id="statusMix">259 / 371 models on time</strong></div><div class="track"><span id="statusOnFill" style="background:#1f8b73"></span><span id="statusProgFill" style="background:#1da6bb"></span><span id="statusPlanFill" style="background:#c79225"></span></div><div class="legend"><span><i class="dot" style="background:#1f8b73"></i>On time</span><span><i class="dot" style="background:#1da6bb"></i>In progress</span><span><i class="dot" style="background:#c79225"></i>Planned</span></div></div>
-          <div class="foot"><div><div class="cap">On-time SEEG / LOCAL</div><div class="big" id="stCoverage">259 / 371</div></div><div style="text-align:right"><div class="cap">Rule</div><div class="big">≤ 12 weeks</div></div></div>
+          <div class="mix"><div class="mixhead"><span>Progress mix (exclusive)</span><strong id="statusMix">—</strong></div><div class="track"><span id="mixDone" style="background:#1f8b73"></span><span id="mixPast" style="background:#c65048"></span><span id="mixNow" style="background:#1da6bb"></span><span id="mixNext" style="background:#c79225"></span><span id="mixNoPlan" style="background:#b7c4cf"></span></div><div class="legend"><span><i class="dot" style="background:#1f8b73"></i><span id="lgDone">Confirmed</span></span><span><i class="dot" style="background:#c65048"></i><span id="lgPast">Plan week passed</span></span><span><i class="dot" style="background:#1da6bb"></i>This week</span><span><i class="dot" style="background:#c79225"></i>Upcoming</span><span><i class="dot" style="background:#b7c4cf"></i>No plan</span></div></div>
+          <div class="foot"><div><div class="cap">On-time SEEG / LOCAL</div><div class="big" id="stCoverage">0 / 0</div></div><div style="text-align:right"><div class="cap">Rule</div><div class="big">≥ <span class="rLocal">12</span> weeks before MP</div></div></div>
         </div>
       </section>
 
@@ -300,34 +370,56 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
         <div class="panelhead"><div><div class="eyebrow">02 · Exception watch</div><div class="paneltitle">Issues</div><div class="panelsub">Models requiring action because SOP timing or BOM confirmation is outside target.</div></div><div class="badge action">Action watch</div></div>
         <div class="panelbody">
           <div class="issues">
-            <div class="issue sop"><div class="issuetop"><div class="issuename"><i></i>SOP issue</div><div class="issuecount"><b id="issGap">65</b><span id="issGapRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> 1st Appear → 1st MP &lt; 12 weeks</div><div class="issuebar"><span id="issGapFill"></span></div><div class="actions"><button class="view danger" id="viewSopBtn">View 65 models</button></div></div>
-            <div class="issue hq"><div class="issuetop"><div class="issuename"><i></i>HQ delay</div><div class="issuecount"><b id="issHQ">111</b><span id="issHQRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> Confirmation after SOP −13W target</div><div class="issuebar"><span id="issHQFill"></span></div><div class="actions"><button class="view" id="viewHqBtn">View 111 models</button></div></div>
-            <div class="issue seeg"><div class="issuetop"><div class="issuename"><i></i>SEEG delay</div><div class="issuecount"><b id="issSEEG">111</b><span id="issSEEGRatio" class="kpi-slash">/ <b class="kpi-total">371</b></span></div></div><div class="issuerule"><strong>Rule:</strong> Confirmation after SOP −12W target</div><div class="issuebar"><span id="issSEEGFill"></span></div><div class="actions"><button class="view" id="viewSeegBtn">View 111 models</button></div></div>
+            <div class="issue sop"><div class="issuetop"><div class="issuename"><i></i>SOP issue</div><div class="issuecount"><b id="issGap">0</b><span id="issGapRatio" class="kpi-slash">/ <b class="kpi-total">0</b></span></div></div><div class="issuerule"><strong>Rule:</strong> 1st Appear in SOP → 1st MP &lt; <span class="rSop">12</span> weeks</div><div class="issuebar"><span id="issGapFill"></span></div><div class="actions"><button class="view danger" id="viewSopBtn">View 0 models</button></div></div>
+            <div class="issue hq"><div class="issuetop"><div class="issuename"><i></i>HQ delay</div><div class="issuecount"><b id="issHQ">0</b><span id="issHQRatio" class="kpi-slash">/ <b class="kpi-total">0</b></span></div></div><div class="issuerule"><strong>Rule:</strong> HQ BOM planned after MP −<span class="rHq">13</span>W target</div><div class="cause" id="hqCause"></div><div class="issuebar"><span id="issHQFill"></span></div><div class="actions"><button class="view" id="viewHqBtn">View 0 models</button></div></div>
+            <div class="issue seeg"><div class="issuetop"><div class="issuename"><i></i>SEEG delay</div><div class="issuecount"><b id="issSEEG">0</b><span id="issSEEGRatio" class="kpi-slash">/ <b class="kpi-total">0</b></span></div></div><div class="issuerule"><strong>Rule:</strong> LOCAL BOM planned after MP −<span class="rLocal">12</span>W target</div><div class="cause" id="seegCause"></div><div class="issuebar"><span id="issSEEGFill"></span></div><div class="actions"><button class="view" id="viewSeegBtn">View 0 models</button></div></div>
           </div>
           <div class="notice" id="issueSummary">Issue counts update with the global filter.</div>
         </div>
       </section>
     </div>
+
+    <div class="v3-row">
+      <section class="v3-card">
+        <div class="v28-charthead"><div><div class="v28-charttitle">LOCAL BOM confirmation timeline</div><div class="v28-chartsub">Open (unconfirmed) LOCAL BOM plans by plan week; the outlined bar is the current week. Click a bar to list its models.</div></div><div class="v28-chartmeta" id="tlMeta"></div></div>
+        <div class="tl" id="timeline"></div>
+        <div class="mini-legend"><span><i class="dot" style="background:var(--green)"></i>On time</span><span><i class="dot" style="background:var(--red)"></i>Late vs target</span><span><i class="dot" style="background:#b7c4cf"></i>No target</span></div>
+      </section>
+      <section class="v3-card">
+        <div class="v28-charthead"><div><div class="v28-charttitle">Projects</div><div class="v28-chartsub">BOM scope per project. Click a project to filter the whole dashboard.</div></div><div class="v28-chartmeta" id="projMeta"></div></div>
+        <div class="ptwrap"><table class="ptable"><thead><tr><th>Project</th><th class="num">Models</th><th>On time</th><th class="num">Late</th><th class="num">SOP issue</th><th class="num">Due ≤ 4W</th></tr></thead><tbody id="projBody"></tbody></table></div>
+      </section>
+    </div>
+
+    <div class="v3-row">
+      <section class="v3-card">
+        <div class="v28-charthead"><div><div class="v28-charttitle">Since last refresh</div><div class="v28-chartsub" id="chgSub">Changes between the two most recent data refreshes.</div></div><button class="view" id="viewChangedBtn">View changed</button></div>
+        <div class="spark" id="spark"></div>
+        <div class="chg" id="changes"></div>
+      </section>
+      <section class="v3-card">
+        <div class="v28-charthead"><div><div class="v28-charttitle">Data &amp; logic checks</div><div class="v28-chartsub">Consistency checks across the three source files (within the active filter).</div></div></div>
+        <div class="checks" id="checks"></div>
+      </section>
+    </div>
   </div></section>
 
-
-  
 <section class="slide" id="update">
   <div class="content">
     <div class="hero">
       <div>
         <div class="kicker">System · Data update</div>
         <h2>Update data</h2>
-        <p>Attach new source files and refresh the same dashboard, BOM Plan and All Models format without rebuilding the presentation.</p>
+        <p>Attach the three source workbooks (any order – each file is recognised by its column headers) and refresh the Dashboard, BOM Plan and All Models. Files are read locally by desktop Excel; nothing leaves this computer.</p>
       </div>
-      <div class="week"><span>Current planning week</span><b>W37 / 2026</b></div>
+      <div class="week"><span>Current planning week</span><b id="planWeek">—</b></div>
     </div>
 
     <div class="update-grid">
       <section class="update-card">
         <div class="update-num">01</div>
-        <div class="update-title">Model source</div>
-        <div class="update-sub">Model Code · MKT Project · Project · Inch</div>
+        <div class="update-title">DASH status file</div>
+        <div class="update-sub">MODEL_CODE · MKT_PROJECT · PROJECT_NAME</div>
         <label class="file-drop">
           <input id="fileSource1" type="file" accept=".xlsx,.xlsm,.xlsb">
           <span class="file-icon">↑</span>
@@ -337,8 +429,8 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
 
       <section class="update-card">
         <div class="update-num">02</div>
-        <div class="update-title">SOP source</div>
-        <div class="update-sub">Item · Project · Inch · Version / 1st MP timing fields</div>
+        <div class="update-title">SEEG SOP file</div>
+        <div class="update-sub">Item · Project · Inch · Cate · Version · weekly columns (YYYYWW)</div>
         <label class="file-drop">
           <input id="fileSource2" type="file" accept=".xlsx,.xlsm,.xlsb">
           <span class="file-icon">↑</span>
@@ -348,8 +440,8 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
 
       <section class="update-card">
         <div class="update-num">03</div>
-        <div class="update-title">BOM source</div>
-        <div class="update-sub">Model · Project · Inch · BOM PLAN HQ / LOCAL</div>
+        <div class="update-title">New Model BOM file</div>
+        <div class="update-sub">Project · Model · Type (Plan/Actual) · Inch · BOM HQ / LOCAL · SET PLANT MP</div>
         <label class="file-drop">
           <input id="fileSource3" type="file" accept=".xlsx,.xlsm,.xlsb">
           <span class="file-icon">↑</span>
@@ -365,113 +457,404 @@ table{border-collapse:separate;border-spacing:0;width:100%;min-width:1260px}th,t
     </div>
 
     <section class="system-help">
-      <div><b>Automatic processing</b><span>Reads XLSX / CSV / HTML / JSON locally in the browser and deduplicates model records.</span></div>
-      <div><b>Same formatting</b><span>Refreshes Dashboard, BOM Plan, All Models and all filters using the current presentation style.</span></div>
-      <div><b>Source mapping</b><span>Columns are matched by name, with flexible aliases for Model / Item / Project / Inch / BOM HQ / BOM LOCAL and SOP timing fields.</span></div>
+      <div><b>Automatic recognition</b><span>Each workbook is identified by its headers, not its name. Column order, extra columns, title rows and header spelling noise are tolerated.</span></div>
+      <div><b>Safe refresh</b><span>If a file is rejected the previous data stays in place and the reason is shown here. No macros are run and the files are never modified.</span></div>
+      <div><b>Inbox fallback</b><span>If the browser cannot read the files, put the 3 workbooks in the <i>inbox</i> folder and click Process without attaching anything.</span></div>
     </section>
+
+    <div class="datagrid">
+      <section class="v3-card">
+        <div class="v28-charthead"><div><div class="v28-charttitle">Current data</div><div class="v28-chartsub">What the dashboard is showing right now.</div></div></div>
+        <div class="kv" id="dataInfo"><span>Status</span><span>No data loaded yet</span></div>
+        <ul class="notes" id="dataNotes"></ul>
+      </section>
+      <section class="v3-card">
+        <div class="v28-charthead"><div><div class="v28-charttitle">Refresh history</div><div class="v28-chartsub">Headline numbers of each successful refresh (BOM scope).</div></div></div>
+        <div class="ptwrap"><table class="hist"><thead><tr><th>Refreshed</th><th>SOP ver.</th><th>Models</th><th>On time</th><th>Late</th><th>SOP iss.</th><th>Changed</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+      </section>
+    </div>
   </div>
 </section>
 
-<section class="slide" id="bom"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">BOM Confirmation Plan</div><div class="tablesub" id="bomSub">371 planned models</div></div><button id="exportBom" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>BOM HQ</th><th>BOM LOCAL</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>HQ Status</th><th>LOCAL Status</th></tr></thead><tbody id="bomBody"></tbody></table></div><div class="pager"><span class="small" id="bomInfo"></span><div><button id="bomPrev">‹</button><button id="bomNext">›</button></div></div></div></div></section>
+<section class="slide" id="bom"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">BOM Confirmation Plan</div><div class="tablesub" id="bomSub">0 planned models</div></div><div class="tabletools"><select id="pageSize" title="Rows per page"><option value="35">35 rows</option><option value="100">100 rows</option><option value="250">250 rows</option></select><button id="exportBom" class="view">Export CSV</button></div></div><div class="chips" id="bomChips"></div><div class="tablewrap"><table><thead id="bomHead"></thead><tbody id="bomBody"></tbody></table></div><div class="pager"><span class="small" id="bomInfo"></span><div class="pg"><button id="bomFirst" title="First page">«</button><button id="bomPrev">‹</button><button id="bomNext">›</button><button id="bomLast" title="Last page">»</button></div></div></div></div></section>
 
-  <section class="slide" id="master"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">All Models</div><div class="tablesub">Complete deduplicated model universe · 1,907 models</div></div><button id="exportMaster" class="view">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Model</th><th>Project</th><th>Inch</th><th>Project Name</th><th>Latest SOP</th><th>1st Appear in SOP</th><th>1st Appear → 1st MP</th><th>1st MP</th><th>SOP -13W HQ</th><th>SOP -12W LOCAL</th><th>BOM HQ</th><th>BOM LOCAL</th><th>HQ Status</th><th>LOCAL Status</th><th>Coverage</th></tr></thead><tbody id="masterBody"></tbody></table></div><div class="pager"><span class="small" id="masterInfo"></span><div><button id="masterPrev">‹</button><button id="masterNext">›</button></div></div></div></div></section>
+  <section class="slide" id="master"><div class="content"><div class="tablepanel"><div class="tablehead"><div><div class="tabletitle">All Models</div><div class="tablesub" id="masterSub">Complete deduplicated model universe</div></div><div class="tabletools"><button id="exportMaster" class="view">Export CSV</button></div></div><div class="chips" id="masterChips"></div><div class="tablewrap"><table><thead id="masterHead"></thead><tbody id="masterBody"></tbody></table></div><div class="pager"><span class="small" id="masterInfo"></span><div class="pg"><button id="masterFirst" title="First page">«</button><button id="masterPrev">‹</button><button id="masterNext">›</button><button id="masterLast" title="Last page">»</button></div></div></div></div></section>
 </div></div>
+
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"><header><div><div class="eyebrow" id="drawerKicker">Model</div><h3 id="drawerTitle">—</h3></div><button class="x" id="drawerClose" title="Close (Esc)">✕</button></header><div class="body" id="drawerBody"></div></aside>
+<div class="toast" id="toast"></div>
 
 <script>
 let BOM_DATA=[];  // populated live by the local service (see server.py /api/data) - never a static real-data snapshot
 let MASTER_DATA=[];  // populated live by the local service (see server.py /api/data) - never a static real-data snapshot
-const CURRENT_YEAR=2026,CURRENT_WEEK=37,PAGE_SIZE=35;
-let state={tab:'dashboard',bomPage:1,masterPage:1,issueFilter:''};
+let RULES={hqWeeks:13,localWeeks:12,sopLeadWeeks:12}, META=null, HISTORY=[], CHANGES=[];
+let state={tab:'dashboard',bomPage:1,masterPage:1,issueFilter:'',masterFilter:'',bomSort:null,masterSort:null,pageSize:35};
 
+/* ------------------------------------------------------------------ dates (ISO weeks, all in UTC) */
+const DAY=864e5, WEEK=7*DAY, DASH='—';
+function utcMonday(y,m,d){const x=Date.UTC(y,m,d);return x-((new Date(x).getUTCDay()+6)%7)*DAY}
+function weekInfo(ms){const y=new Date(ms+3*DAY).getUTCFullYear();return{y,w:1+Math.floor((ms-utcMonday(y,0,4))/WEEK)}}
+function isoWeekMonday(y,w){return utcMonday(y,0,4)+(w-1)*WEEK}
+function msIso(ms){return new Date(ms).toISOString().slice(0,10)}
+function isoMs(s){return Date.parse(s+'T00:00:00Z')}
+function wkLabel(ms){const i=weekInfo(ms);return 'W'+String(i.w).padStart(2,'0')+' / '+i.y}
+const NOW=new Date(), CUR_MS=utcMonday(NOW.getFullYear(),NOW.getMonth(),NOW.getDate()), CUR_ISO=msIso(CUR_MS);
+const CUR=weekInfo(CUR_MS), CURRENT_YEAR=CUR.y, CURRENT_WEEK=CUR.w, PAGE_SIZE=35;
 function week(s){const m=String(s||'').match(/W(\d{1,2})\s*\/\s*(\d{4})/i);return m?{w:+m[1],y:+m[2]}:null}
 function idx(w){return w?w.y*53+w.w:null}
+function wIso(x,isoKey,labelKey){const v=x[isoKey];if(v)return v;const w=week(x[labelKey]);return w?msIso(isoWeekMonday(w.y,w.w)):null}
+function weeksFrom(iso,baseMs){return iso?Math.round((isoMs(iso)-baseMs)/WEEK):null}
+
+/* ------------------------------------------------------------------ helpers */
 function pct(n,t){return t?((n/t)*100).toFixed(1):'0.0'}
 function gapNum(s){const m=String(s||'').match(/(-?\d+(?:\.\d+)?)\s*weeks?/i);return m?+m[1]:null}
-function issueRows(rows,k){if(k==='sop')return rows.filter(x=>{const g=gapNum(x.firstAppearMpGap);return g!==null&&g<12});if(k==='hq')return rows.filter(x=>x.hqStatus==='LATER');if(k==='seeg')return rows.filter(x=>x.localStatus==='LATER');return rows}
-function baseBOM(){const q=(document.getElementById('globalSearch').value||'').toLowerCase().trim(),p=document.getElementById('globalProject').value||'';return BOM_DATA.filter(x=>(!q||[x.model,x.project,x.inch].join(' ').toLowerCase().includes(q))&&(!p||x.project===p))}
-function filteredBOM(){const r=baseBOM();return state.issueFilter?issueRows(r,state.issueFilter):r}
-function filteredMaster(){const q=(document.getElementById('globalSearch').value||'').toLowerCase().trim(),p=document.getElementById('globalProject').value||'';return MASTER_DATA.filter(x=>(!q||[x.model,x.project,x.inch,x.projectName,x.coverage].join(' ').toLowerCase().includes(q))&&(!p||x.project===p))}
-function statusOf(x){const w=week(x.bomLocal);if(!w)return 'PLANNED';if(x.localStatus==='MATCH'&&idx(w)>=idx({y:CURRENT_YEAR,w:CURRENT_WEEK}))return 'ON TIME';if(w.y===CURRENT_YEAR&&w.w===CURRENT_WEEK)return 'IN PROGRESS';if(idx(w)>idx({y:CURRENT_YEAR,w:CURRENT_WEEK}))return 'PLANNED';return x.localStatus==='MATCH'?'ON TIME':'PLANNED'}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function badge(v){const c=v==='MATCH'?'match':v==='LATER'?'later':v==='EARLIER'?'earlier':'na';return '<span class="statusbadge '+c+'">'+esc(v||'N/A')+'</span>'}
-function risk(v){const g=gapNum(v);return g!==null&&g<12?'<span class="risktext">⚠ '+esc(v)+'</span>':esc(v||'—')}
-function val(v){return esc(v||'—')}
+function val(v){return esc(v===0?'0':(v||DASH))}
+function fmtN(n){return Number(n||0).toLocaleString()}
+const $=id=>document.getElementById(id);
+function set(id,v){const e=$(id);if(e)e.textContent=v}
+function toast(msg,err){const t=$('toast');t.textContent=msg;t.className='toast show'+(err?' err':'');clearTimeout(toast._t);toast._t=setTimeout(()=>t.className='toast',err?7000:3500)}
 
+/* Derived, cached per row: plan weeks, progress phase, issue flags, delay cause. Tolerates rows that only
+   carry the display labels (older data / tests) by parsing "W29 / 2026". */
+const D_KEY=Symbol('derived');
+function der(x){
+  let d=x[D_KEY]; if(d)return d;
+  const lo=wIso(x,'bomLocalIso','bomLocal'), hq=wIso(x,'bomHQIso','bomHQ'), mp=wIso(x,'mpIso','mp');
+  const g=(typeof x.gapWeeks==='number')?x.gapWeeks:gapNum(x.firstAppearMpGap);
+  const confirmed=!!x.localConfirmed;
+  const phase=confirmed?'done':!lo?'noplan':lo<CUR_ISO?'past':lo===CUR_ISO?'now':'next';
+  const late=x.localStatus==='LATER', hqLate=x.hqStatus==='LATER';
+  const mm=(typeof x.mpMismatch==='number')?x.mpMismatch:null;
+  const pull=(dl)=>mm!==null&&mm<0&&typeof dl==='number'&&dl>0&&dl<=-mm;   // the delay is fully explained by MP moving earlier
+  d={lo,hq,mp,g,phase,late,hqLate,confirmed,
+     onTime:x.localStatus==='MATCH'||x.localStatus==='EARLIER',
+     sop:g!==null&&g<RULES.sopLeadWeeks,
+     wk:weeksFrom(lo,CUR_MS), mm, pullLocal:late&&pull(x.localDelta), pullHq:hqLate&&pull(x.hqDelta)};
+  try{Object.defineProperty(x,D_KEY,{value:d})}catch(e){}
+  return d;
+}
+const PHASE={done:['Confirmed','ph-done'],now:['This week','ph-now'],next:['Upcoming','ph-next'],past:['Plan passed','ph-past'],noplan:['No plan','ph-noplan']};
+function hasActuals(){return BOM_DATA.some(x=>x.localConfirmed||x.hqConfirmed)}
+
+/* ------------------------------------------------------------------ indexes (rebuilt only when the data changes) */
+let IX={bom:null,mlen:-1,m0:null,proj:new Map(),changed:new Set()};
+function ix(){
+  if(IX.bom===BOM_DATA&&IX.mlen===MASTER_DATA.length&&IX.m0===MASTER_DATA[0]&&IX.ch===CHANGES)return IX;
+  const proj=new Map();for(const m of MASTER_DATA)if(m&&m.project)proj.set(m.model,m.project);
+  IX={bom:BOM_DATA,mlen:MASTER_DATA.length,m0:MASTER_DATA[0],proj,ch:CHANGES,changed:new Set(CHANGES.map(c=>c.model))};
+  return IX;
+}
+
+/* ------------------------------------------------------------------ filters */
+const FILTERS={
+  ontime:{t:'On time',f:x=>der(x).onTime},
+  late:{t:'SEEG delay',f:x=>der(x).late},
+  sop:{t:'SOP issue',f:x=>der(x).sop},
+  hq:{t:'HQ delay',f:x=>der(x).hqLate},
+  seeg:{t:'SEEG delay',f:x=>der(x).late},
+  pull:{t:'Delay from MP pull-in',f:x=>der(x).pullLocal||der(x).pullHq},
+  now:{t:'Due this week',f:x=>der(x).phase==='now'},
+  next:{t:'Upcoming',f:x=>der(x).phase==='next'},
+  soon:{t:'Due ≤ 4 weeks',f:x=>{const d=der(x);return(d.phase==='now'||d.phase==='next')&&d.wk<=4}},
+  past:{t:'Plan passed, not confirmed',f:x=>der(x).phase==='past'},
+  noplan:{t:'No LOCAL plan',f:x=>der(x).phase==='noplan'},
+  done:{t:'Confirmed',f:x=>der(x).phase==='done'},
+  mpmis:{t:'MP mismatch',f:x=>!!der(x).mm},
+  hqafter:{t:'HQ after LOCAL',f:x=>!!x.hqAfterLocal},
+  changed:{t:'Changed since last refresh',f:x=>ix().changed.has(x.model)},
+};
+function wkFilter(iso,to){to=to||iso;return{t:'Open LOCAL plan '+wkLabel(isoMs(iso))+(to!==iso?' – '+wkLabel(isoMs(to)):''),f:x=>{const d=der(x);return !d.confirmed&&d.lo>=iso&&d.lo<=to}}}
+function activeFilter(){const k=state.issueFilter;if(!k)return null;if(k.startsWith('wk:'))return wkFilter(...k.slice(3).split(':'));return FILTERS[k]||null}
+const BOM_CHIPS=['sop','hq','seeg','pull','now','soon','past','noplan','mpmis','hqafter','changed'];
+function issueRows(rows,k){const f=k&&(k.startsWith('wk:')?wkFilter(...k.slice(3).split(':')):FILTERS[k]);return f?rows.filter(f.f):rows}
+function query(){return{q:($('globalSearch').value||'').toLowerCase().trim(),p:$('globalProject').value||'',i:$('globalInch').value||''}}
+function baseBOM(){
+  const {q,p,i}=query(), P=ix().proj;
+  return BOM_DATA.filter(x=>(!p||x.project===p||P.get(x.model)===p)&&(!i||String(x.inch??'')===i)&&
+    (!q||[x.model,x.project,x.inch,P.get(x.model)].join(' ').toLowerCase().includes(q)));
+}
+function filteredBOM(){const r=baseBOM(),f=activeFilter();return sortRows(f?r.filter(f.f):r,state.bomSort,BOM_COLS)}
+const MASTER_FILTERS={bom:{t:'In BOM plan',f:x=>String(x.coverage||'').includes('BOM')},nobom:{t:'Not in BOM plan',f:x=>!String(x.coverage||'').includes('BOM')},
+  soponly:{t:'SOP only',f:x=>x.coverage==='SOP'},dashonly:{t:'DASH only',f:x=>x.coverage==='DASH'},nomp:{t:'No MP week',f:x=>!wIso(x,'mpIso','mp')}};
+function baseMaster(){const {q,p,i}=query();return MASTER_DATA.filter(x=>(!q||[x.model,x.project,x.inch,x.projectName,x.coverage].join(' ').toLowerCase().includes(q))&&(!p||x.project===p)&&(!i||String(x.inch??'')===i))}
+function filteredMaster(){const r=baseMaster(),f=MASTER_FILTERS[state.masterFilter];return sortRows(f?r.filter(f.f):r,state.masterSort,MASTER_COLS)}
+
+/* ------------------------------------------------------------------ table columns */
+function badge(v,delta){const c=v==='MATCH'?'match':v==='LATER'?'later':v==='EARLIER'?'earlier':'na';
+  const d=(typeof delta==='number'&&delta!==0)?'<span class="delta">'+(delta>0?'+':'')+delta+'W</span>':'';
+  return '<span class="statusbadge '+c+'">'+esc(v||'N/A')+'</span>'+d}
+function risk(x){const d=der(x);return d.sop?'<span class="risktext">⚠ '+esc(x.firstAppearMpGap)+'</span>':esc(x.firstAppearMpGap||DASH)}
+function mpCell(x){const d=der(x);return val(x.mp)+(d.mm?'<span class="mis" title="New Model file MP: '+esc(x.nmMpIso?wkLabel(isoMs(x.nmMpIso)):'')+'">'+(d.mm>0?'+':'')+d.mm+'W vs NM</span>':'')}
+function phaseCell(x){const p=PHASE[der(x).phase];return '<span class="phase '+p[1]+'">'+p[0]+'</span>'}
+const txt=k=>x=>x[k];
+const BOM_COLS=[
+  {k:'model',t:'Model'},{k:'project',t:'Project'},{k:'inch',t:'Inch',s:x=>parseFloat(x.inch)||0},
+  {k:'bomHQ',t:'BOM HQ',s:x=>der(x).hq},{k:'bomLocal',t:'BOM LOCAL',s:x=>der(x).lo},
+  {k:'localActual',t:'LOCAL Actual'},{k:'phase',t:'Progress',h:phaseCell,s:x=>['past','now','next','noplan','done'].indexOf(der(x).phase)},
+  {k:'version',t:'Latest SOP',v:x=>x.version?'Version '+x.version:DASH,s:x=>+x.version||0},
+  {k:'firstSop',t:'1st Appear in SOP'},{k:'firstAppearMpGap',t:'1st Appear → 1st MP',h:risk,s:x=>der(x).g},
+  {k:'mp',t:'1st MP',h:mpCell,s:x=>der(x).mp},
+  {k:'hqTarget',t:()=>'SOP -'+RULES.hqWeeks+'W HQ',s:x=>wIso(x,'hqTargetIso','hqTarget')},
+  {k:'localTarget',t:()=>'SOP -'+RULES.localWeeks+'W LOCAL',s:x=>wIso(x,'localTargetIso','localTarget')},
+  {k:'hqStatus',t:'HQ Status',h:x=>badge(x.hqStatus,x.hqDelta),s:x=>x.hqDelta},
+  {k:'localStatus',t:'LOCAL Status',h:x=>badge(x.localStatus,x.localDelta),s:x=>x.localDelta},
+];
+const MASTER_COLS=[
+  {k:'model',t:'Model'},{k:'project',t:'Project'},{k:'inch',t:'Inch',s:x=>parseFloat(x.inch)||0},{k:'projectName',t:'Project Name'},
+  {k:'version',t:'Latest SOP',v:x=>x.version?'Version '+x.version:DASH,s:x=>+x.version||0},
+  {k:'firstSop',t:'1st Appear in SOP'},{k:'firstAppearMpGap',t:'1st Appear → 1st MP',h:risk,s:x=>der(x).g},
+  {k:'mp',t:'1st MP',h:mpCell,s:x=>der(x).mp},
+  {k:'hqTarget',t:()=>'SOP -'+RULES.hqWeeks+'W HQ',s:x=>wIso(x,'hqTargetIso','hqTarget')},
+  {k:'localTarget',t:()=>'SOP -'+RULES.localWeeks+'W LOCAL',s:x=>wIso(x,'localTargetIso','localTarget')},
+  {k:'bomHQ',t:'BOM HQ',s:x=>der(x).hq},{k:'bomLocal',t:'BOM LOCAL',s:x=>der(x).lo},
+  {k:'hqStatus',t:'HQ Status',h:x=>badge(x.hqStatus,x.hqDelta),s:x=>x.hqDelta},
+  {k:'localStatus',t:'LOCAL Status',h:x=>badge(x.localStatus,x.localDelta),s:x=>x.localDelta},
+  {k:'coverage',t:'Coverage'},
+];
+const title=c=>typeof c.t==='function'?c.t():c.t;
+function cellHtml(c,x){return c.h?c.h(x):c.v?esc(c.v(x)):val(x[c.k])}
+function sortRows(rows,s,cols){
+  if(!s)return rows;const c=cols.find(c=>c.k===s.k);if(!c)return rows;
+  const get=c.s||(c.v?c.v:x=>x[c.k]);
+  const key=rows.map((x,i)=>{const v=get(x);return[v===null||v===undefined||v===''||v===DASH?null:v,i]});
+  key.sort((a,b)=>{if(a[0]===null)return b[0]===null?a[1]-b[1]:1;if(b[0]===null)return -1;
+    const r=(typeof a[0]==='number'&&typeof b[0]==='number')?a[0]-b[0]:String(a[0]).localeCompare(String(b[0]),undefined,{numeric:true});
+    return (r*s.dir)||(a[1]-b[1])});
+  return key.map(k=>rows[k[1]]);
+}
+function renderHead(id,cols,s){
+  $(id).innerHTML='<tr>'+cols.map(c=>{const on=s&&s.k===c.k;return '<th class="sortable'+(on?' sorted':'')+'" data-k="'+c.k+'">'+esc(title(c))+'<span class="arr">'+(on?(s.dir>0?'▲':'▼'):'↕')+'</span></th>'}).join('')+'</tr>';
+}
+function renderChips(id,keys,defs,active,rows){
+  $(id).innerHTML='<button class="chip'+(active?'':' on')+'" data-f="">All <b>'+rows.length+'</b></button>'+
+    keys.map(k=>{const n=rows.filter(defs[k].f).length;return '<button class="chip'+(active===k?' on':'')+'" data-f="'+k+'"'+(n||active===k?'':' disabled')+'>'+esc(defs[k].t)+' <b>'+n+'</b></button>'}).join('')+
+    (active&&!keys.includes(active)&&activeFilter()?'<button class="chip on" data-f="'+esc(active)+'">'+esc(activeFilter().t)+' ✕</button>':'');
+}
+
+/* ------------------------------------------------------------------ dashboard */
 function renderDashboard(){
-  const base=baseBOM(), total=base.length||1;
-  const on=base.filter(x=>x.localStatus==='MATCH').length, prog=0, plan=0;
-  const sop=base.filter(x=>{const g=gapNum(x.firstAppearMpGap);return g!==null&&g<12}).length;
-  const hq=base.filter(x=>x.hqStatus==='LATER').length;
-  const seeg=base.filter(x=>x.localStatus==='LATER').length;
-  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
-  const p=(n)=>total?((n/total)*100).toFixed(1):'0.0';
-  const fill=(id,n,max=total)=>{const e=document.getElementById(id);if(e)e.style.width=(max?Math.min(100,n/max*100):0)+'%'};
-  set('statusScope',base.length.toLocaleString()+' models');
-  set('stOn',on);set('stOnTotal',base.length);set('stProg',prog);set('stProgTotal',base.length);set('stPlan',plan);set('stPlanTotal',base.length);
-  set('statusMix',on+' / '+base.length+' models on time');set('stCoverage',on+' / '+base.length);
-  fill('statusOnFill',on);fill('statusProgFill',prog);fill('statusPlanFill',plan);
+  const base=baseBOM(), n=base.length, total=n||1;
+  let on=0,late=0,prog=0,plan=0,sop=0,hq=0,seeg=0,any=0,pullL=0,pullH=0;const ph={done:0,past:0,now:0,next:0,noplan:0};
+  for(const x of base){const d=der(x);if(d.onTime)on++;if(d.late)seeg++;if(d.hqLate)hq++;if(d.sop)sop++;if(d.sop||d.late||d.hqLate)any++;
+    if(d.pullLocal)pullL++;if(d.pullHq)pullH++;ph[d.phase]++;}
+  late=seeg;prog=ph.now;plan=ph.next;const noplan=n-on-late;
+  const p=(k)=>pct(k,n);
+  const fill=(id,k,max=total)=>{const e=$(id);if(e)e.style.width=(max?Math.min(100,k/max*100):0)+'%'};
+  set('statusScope',fmtN(n)+' models');
+  set('stOn',on);set('stOnTotal',n);set('stProg',prog);set('stProgTotal',n);set('stPlan',plan);set('stPlanTotal',n);
+  fill('stOnFill',on);fill('stProgFill',prog);fill('stPlanFill',plan);
+  const tracked=hasActuals();
+  set('lgDone',tracked?'Confirmed':'Confirmed (no Actual data)');set('lgPast',tracked?'Plan passed, not confirmed':'Plan week passed');
+  set('statusMix',tracked?(ph.done+' confirmed · '+ph.past+' overdue · '+ph.now+' this week · '+ph.next+' upcoming'):(ph.past+' past · '+ph.now+' this week · '+ph.next+' upcoming'));
+  $('mixPast').style.background=tracked?'#c65048':'#7e9aae';$('lgPast').previousElementSibling.style.background=tracked?'#c65048':'#7e9aae';
+  fill('mixDone',ph.done);fill('mixPast',ph.past);fill('mixNow',ph.now);fill('mixNext',ph.next);fill('mixNoPlan',ph.noplan);
+  set('stCoverage',on+' / '+n);
   set('issGap',sop);set('issHQ',hq);set('issSEEG',seeg);
-  ['issGapRatio','issHQRatio','issSEEGRatio'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='/ <b class="kpi-total">'+base.length.toLocaleString()+'</b>';});
+  ['issGapRatio','issHQRatio','issSEEGRatio'].forEach(id=>{const e=$(id);if(e)e.innerHTML='/ <b class="kpi-total">'+fmtN(n)+'</b>'});
   fill('issGapFill',sop);fill('issHQFill',hq);fill('issSEEGFill',seeg);
   set('viewSopBtn','View '+sop+' models');set('viewHqBtn','View '+hq+' models');set('viewSeegBtn','View '+seeg+' models');
-  set('issueSummary',sop+' SOP issues · '+hq+' HQ delays · '+seeg+' SEEG delays · active scope '+base.length+' models.');
-  set('v27StatusTotal',base.length.toLocaleString()+' models');set('v27IssueTotal',base.length.toLocaleString()+' models');
-  set('v27On',on);set('v27Prog',prog);set('v27Plan',plan);set('v27OnPct',p(on)+'%');set('v27ProgPct',p(prog)+'%');set('v27PlanPct',p(plan)+'%');
-  fill('v27OnFill',on);fill('v27ProgFill',prog);fill('v27PlanFill',plan);
-  set('v27Sop',sop);set('v27Hq',hq);set('v27Seeg',seeg);set('v27SopPct',p(sop)+'%');set('v27HqPct',p(hq)+'%');set('v27SeegPct',p(seeg)+'%');
-  const mx=Math.max(sop,hq,seeg,1);fill('v27SopFill',sop,mx);fill('v27HqFill',hq,mx);fill('v27SeegFill',seeg,mx);
-  // V28: chart values always come from the same filtered base data.
-  set('v28StatusTotal',base.length.toLocaleString()+' models'); set('v28IssueTotal',base.length.toLocaleString()+' models'); set('v28StatusCenter',base.length.toLocaleString());
-  set('v28On',on); set('v28Prog',prog); set('v28Plan',plan); set('v28OnPct',p(on)+'%'); set('v28ProgPct',p(prog)+'%'); set('v28PlanPct',p(plan)+'%');
-  set('v28Sop',sop); set('v28Hq',hq); set('v28Seeg',seeg); set('v28SopPct',p(sop)+'%'); set('v28HqPct',p(hq)+'%'); set('v28SeegPct',p(seeg)+'%');
-  const stAngles=[on/total*360,prog/total*360,plan/total*360]; const s1=stAngles[0], s2=s1+stAngles[1];
-  const sd=document.getElementById('v28StatusDonut'); if(sd) sd.style.background=`conic-gradient(var(--green) 0deg ${s1}deg,var(--cyan) ${s1}deg ${s2}deg,var(--amber) ${s2}deg 360deg)`;
-  const id1=sop/total*360, id2=id1+hq/total*360; const id=document.getElementById('v28IssueDonut'); if(id) id.style.background=`conic-gradient(var(--red) 0deg ${id1}deg,var(--amber) ${id1}deg ${id2}deg,#9cafc1 ${id2}deg 360deg)`;
-  set('v28IssueCenter',sop+hq+seeg);
-  const sb=(id,n)=>{
-    const e=document.getElementById(id);
-    if(e)e.style.width=(base.length?((n/base.length)*100):0)+'%';
-  };
-  sb('stOnFill',on);
-  sb('stProgFill',prog);
-  sb('stPlanFill',plan);
+  $('hqCause').innerHTML=hq?'<strong>'+pullH+'</strong> of '+hq+' caused only by the SOP moving MP earlier than the New Model plan':'';
+  $('seegCause').innerHTML=seeg?'<strong>'+pullL+'</strong> of '+seeg+' caused only by the SOP moving MP earlier than the New Model plan':'';
+  set('issueSummary',fmtN(any)+' of '+fmtN(n)+' models have at least one issue · '+sop+' SOP · '+hq+' HQ · '+seeg+' SEEG'+(state.issueFilter?' · table filter: '+(activeFilter()?activeFilter().t:''):''));
+  // charts
+  set('v28StatusTotal',fmtN(n)+' models');set('v28IssueTotal',fmtN(n)+' models');set('v28StatusCenter',fmtN(n));
+  set('v28On',on);set('v28Late',late);set('v28NoPlan',noplan);set('v28OnPct',p(on)+'%');set('v28LatePct',p(late)+'%');set('v28NoPlanPct',p(noplan)+'%');
+  const a1=on/total*360,a2=a1+late/total*360;
+  $('v28StatusDonut').style.background=n?`conic-gradient(var(--green) 0deg ${a1}deg,var(--red) ${a1}deg ${a2}deg,#9cafc1 ${a2}deg 360deg)`:'#edf2f5';
+  set('v28Sop',sop);set('v28Hq',hq);set('v28Seeg',seeg);set('v28SopPct',p(sop)+'%');set('v28HqPct',p(hq)+'%');set('v28SeegPct',p(seeg)+'%');
+  // issue donut: exclusive split of the scope by its most severe issue, so the ring always sums to the scope
+  let e1=0,e2=0,e3=0;for(const x of base){const d=der(x);if(d.sop)e1++;else if(d.hqLate)e2++;else if(d.late)e3++;}
+  const b1=e1/total*360,b2=b1+e2/total*360,b3=b2+e3/total*360;
+  $('v28IssueDonut').style.background=n?`conic-gradient(var(--red) 0deg ${b1}deg,var(--amber) ${b1}deg ${b2}deg,#b45e52 ${b2}deg ${b3}deg,#e3eaf0 ${b3}deg 360deg)`:'#edf2f5';
+  set('v28IssueCenter',fmtN(any));
+  renderTimeline(base);renderProjects(base);renderChanges();renderChecks(base);
+}
+function renderTimeline(base){
+  // Every open LOCAL plan week from the earliest to the latest (always including today ±), bucketed so at most 26 bars.
+  let kmin=null,kmax=null;
+  for(const x of base){const d=der(x);if(d.confirmed||!d.lo)continue;if(kmin===null||d.wk<kmin)kmin=d.wk;if(kmax===null||d.wk>kmax)kmax=d.wk}
+  const lo=Math.min(kmin??0,-2),hi=Math.max(kmax??0,4),step=Math.ceil((hi-lo+1)/26),cols=[];
+  for(let k=lo;k<=hi;k+=step)cols.push({k,iso:msIso(CUR_MS+k*WEEK),to:msIso(CUR_MS+(k+step-1)*WEEK),on:0,late:0,na:0});
+  for(const x of base){const d=der(x);if(d.confirmed||!d.lo)continue;const c=cols[Math.floor((d.wk-lo)/step)];if(!c)continue;if(d.onTime)c.on++;else if(d.late)c.late++;else c.na++}
+  const mx=Math.max(1,...cols.map(c=>c.on+c.late+c.na));
+  $('timeline').innerHTML=cols.map(c=>{const t=c.on+c.late+c.na,h=t/mx*100,s=v=>t?v/t*100:0,cur=c.k<=0&&0<c.k+step,w=weekInfo(isoMs(c.iso));
+    const range=wkLabel(isoMs(c.iso))+(step>1?' – '+wkLabel(isoMs(c.to)):'');
+    return '<div class="tl-col'+(cur?' cur':'')+'" data-iso="'+c.iso+'" data-to="'+c.to+'" title="'+range+': '+t+' open ('+c.late+' late vs target)"><span class="tl-n">'+(t||'')+'</span><div class="tl-stack" style="height:'+Math.max(h,1.5)+'%"><i style="height:'+s(c.on)+'%;background:var(--green)"></i><i style="height:'+s(c.late)+'%;background:var(--red)"></i><i style="height:'+s(c.na)+'%;background:#b7c4cf"></i></div><span class="tl-lab">'+(cur&&step===1?'This wk':'W'+String(w.w).padStart(2,'0'))+'</span></div>'}).join('');
+  const open=cols.reduce((n,c)=>n+c.on+c.late+c.na,0);
+  set('tlMeta',open+' open'+(step>1?' · '+step+' weeks per bar':'')+' · '+wkLabel(CUR_MS+lo*WEEK)+' → '+wkLabel(CUR_MS+hi*WEEK));
+}function renderProjects(base){
+  const m=new Map(),P=ix().proj;
+  for(const x of base){const k=x.project||P.get(x.model)||'(none)';let r=m.get(k);if(!r)m.set(k,r={p:k,n:0,on:0,late:0,sop:0,soon:0});
+    const d=der(x);r.n++;if(d.onTime)r.on++;if(d.late)r.late++;if(d.sop)r.sop++;if((d.phase==='now'||d.phase==='next')&&d.wk<=4)r.soon++;}
+  const rows=[...m.values()].sort((a,b)=>b.late-a.late||b.n-a.n||a.p.localeCompare(b.p));
+  set('projMeta',rows.length+' projects');
+  $('projBody').innerHTML=rows.length?rows.slice(0,300).map(r=>{const q=r.n?Math.round(r.on/r.n*100):0;
+    return '<tr data-p="'+esc(r.p)+'"><td>'+esc(r.p)+'</td><td class="num">'+r.n+'</td><td><span class="pbar"><i style="width:'+q+'%"></i></span>'+q+'%</td><td class="num">'+(r.late||'')+'</td><td class="num">'+(r.sop||'')+'</td><td class="num">'+(r.soon||'')+'</td></tr>'}).join(''):'<tr><td colspan="6" class="empty">No models in scope</td></tr>';
+}
+function renderChanges(){
+  const c=CHANGES||[],box=$('changes');
+  const h=HISTORY||[];
+  if(h.length>1){const pts=h.slice(-24).map(r=>r.models?r.on_time/r.models*100:0),W=120,H=28,mn=Math.min(...pts),mx=Math.max(...pts),rg=(mx-mn)||1;
+    const d=pts.map((v,i)=>(i/(pts.length-1)*W).toFixed(1)+','+(H-3-(v-mn)/rg*(H-6)).toFixed(1)).join(' ');
+    $('spark').innerHTML='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'"><polyline points="'+d+'" fill="none" stroke="#1f8b73" stroke-width="2" stroke-linejoin="round"/></svg><span>On-time rate over the last '+pts.length+' refreshes: <b>'+pts[pts.length-1].toFixed(1)+'%</b> (was '+pts[0].toFixed(1)+'%)</span>';
+  }else $('spark').innerHTML='';
+  if(!META){set('chgSub','No data loaded.');box.innerHTML='';return}
+  if(META.first_refresh&&!c.length){set('chgSub','First refresh in this database – changes appear after the next refresh.');box.innerHTML='';$('viewChangedBtn').disabled=true;return}
+  const models=new Set(c.map(x=>x.model));
+  set('chgSub',models.size?models.size+' BOM models changed in the last refresh ('+c.filter(x=>x.kind==='added').length+' added, '+c.filter(x=>x.kind==='removed').length+' removed).':'No BOM changes in the last refresh.');
+  $('viewChangedBtn').disabled=!models.size;
+  box.innerHTML=c.slice(0,200).map(x=>'<div><span class="k '+x.kind+'">'+x.kind+'</span><span class="m" data-m="'+esc(x.model)+'">'+esc(x.model)+'</span><span>'+(x.kind==='changed'?esc(x.field)+': '+esc(x.old||DASH)+' → <b>'+esc(x.new||DASH)+'</b>':esc(x.project||''))+'</span></div>').join('')+(c.length>200?'<div class="empty">… '+(c.length-200)+' more – use “View changed”.</div>':'');
+}
+function renderChecks(base){
+  const cnt=k=>base.filter(FILTERS[k].f).length;
+  const tracked=hasActuals();
+  const items=[
+    ['past',tracked?'Plan passed, not confirmed':'LOCAL plan week already passed',tracked?'LOCAL BOM plan week is before this week and the New Model “Actual” row has no confirmation.':'No “Actual” confirmations in the New Model file, so these are only plan weeks in the past.',tracked?'warn':'info'],
+    ['soon','Due within 4 weeks','Open LOCAL BOM confirmations planned from this week up to 4 weeks ahead.','info'],
+    ['mpmis','MP mismatch SOP vs New Model','1st MP week in the SOP differs from the New Model SET PLANT MP date (targets use the SOP week).','warn'],
+    ['pull','Delays caused by MP pull-in','HQ/SEEG delay that disappears if MP had not moved earlier than the New Model plan.','info'],
+    ['hqafter','HQ BOM after LOCAL BOM','HQ is due first (MP −'+RULES.hqWeeks+'W) but is planned after LOCAL.','warn'],
+    ['noplan','No LOCAL BOM plan / MP','Status cannot be computed: missing LOCAL plan date or MP week.','warn'],
+  ];
+  $('checks').innerHTML=items.map(([k,t,dsc,cls])=>{const n=cnt(k);return '<div class="check '+(n?cls:'ok')+'"><div><div class="ct">'+esc(t)+'</div><div class="cd">'+esc(dsc)+'</div></div><b>'+n+'</b><button class="view" data-f="'+k+'"'+(n?'':' disabled')+'>View</button></div>'}).join('');
+}
 
-} 
-
+/* ------------------------------------------------------------------ tables */
+function pageSize(){return state.pageSize||PAGE_SIZE}
 function renderBOM(){
-  const rows=filteredBOM(),start=(state.bomPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
-  document.getElementById('bomBody').innerHTML=vis.map(x=>'<tr><td>'+val(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td></tr>').join('');
-  const end=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('bomInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';document.getElementById('bomSub').textContent=rows.length+' models shown · BOM confirmation scope';
+  const base=baseBOM(),rows=filteredBOM(),ps=pageSize(),pages=Math.max(1,Math.ceil(rows.length/ps));
+  if(state.bomPage>pages)state.bomPage=pages;
+  const start=(state.bomPage-1)*ps,vis=rows.slice(start,start+ps);
+  renderHead('bomHead',BOM_COLS,state.bomSort);renderChips('bomChips',BOM_CHIPS,FILTERS,state.issueFilter,base);
+  $('bomBody').innerHTML=vis.map((x,i)=>'<tr data-i="'+(start+i)+'">'+BOM_COLS.map(c=>'<td>'+cellHtml(c,x)+'</td>').join('')+'</tr>').join('');
+  const end=Math.min(start+ps,rows.length);$('bomInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';
+  const f=activeFilter();$('bomSub').textContent=rows.length+' models shown · BOM confirmation scope'+(f?' · filter: '+f.t:'');
+  renderBOM.rows=rows;
 }
 function renderMaster(){
-  const rows=filteredMaster(),start=(state.masterPage-1)*PAGE_SIZE,vis=rows.slice(start,start+PAGE_SIZE);
-  document.getElementById('masterBody').innerHTML=vis.map(x=>'<tr><td>'+val(x.model)+'</td><td>'+val(x.project)+'</td><td>'+val(x.inch)+'</td><td>'+val(x.projectName)+'</td><td>'+val(x.version?('Version '+x.version):'—')+'</td><td>'+val(x.firstSop)+'</td><td>'+risk(x.firstAppearMpGap)+'</td><td>'+val(x.mp)+'</td><td>'+val(x.hqTarget)+'</td><td>'+val(x.localTarget)+'</td><td>'+val(x.bomHQ)+'</td><td>'+val(x.bomLocal)+'</td><td>'+badge(x.hqStatus)+'</td><td>'+badge(x.localStatus)+'</td><td>'+val(x.coverage)+'</td></tr>').join('');
-  const end=Math.min(start+PAGE_SIZE,rows.length);document.getElementById('masterInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';
+  const base=baseMaster(),rows=filteredMaster(),ps=pageSize(),pages=Math.max(1,Math.ceil(rows.length/ps));
+  if(state.masterPage>pages)state.masterPage=pages;
+  const start=(state.masterPage-1)*ps,vis=rows.slice(start,start+ps);
+  renderHead('masterHead',MASTER_COLS,state.masterSort);renderChips('masterChips',Object.keys(MASTER_FILTERS),MASTER_FILTERS,state.masterFilter,base);
+  $('masterBody').innerHTML=vis.map((x,i)=>'<tr data-i="'+(start+i)+'">'+MASTER_COLS.map(c=>'<td>'+cellHtml(c,x)+'</td>').join('')+'</tr>').join('');
+  const end=Math.min(start+ps,rows.length);$('masterInfo').textContent=rows.length?(start+1)+'–'+end+' of '+rows.length+' models':'0 models';
+  set('masterSub','Complete deduplicated model universe · '+fmtN(MASTER_DATA.length)+' models'+(rows.length!==MASTER_DATA.length?' · '+fmtN(rows.length)+' shown':''));
+  renderMaster.rows=rows;
+}
+function renderStatic(){
+  document.querySelectorAll('.rLocal').forEach(e=>e.textContent=RULES.localWeeks);document.querySelectorAll('.rHq').forEach(e=>e.textContent=RULES.hqWeeks);
+  document.querySelectorAll('.rSop').forEach(e=>e.textContent=RULES.sopLeadWeeks);
+  const wl=wkLabel(CUR_MS);set('weekChip','Planning week '+wl);set('planWeek',wl);
+  set('sideDate',NOW.toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'}));
+  set('sideData',META&&META.updated_at?'Data: '+META.updated_at.replace('T',' ').slice(0,16):'No data loaded');
+  set('dashMeta',META&&META.updated_at?'Data refreshed '+META.updated_at.replace('T',' ').slice(0,16)+(META.report&&META.report.sop_versions?' · SOP version '+META.report.sop_versions[1]:''):'Status & Issue Management');
+}
+function renderDataInfo(){
+  const m=META;
+  if(!m){$('dataInfo').innerHTML='<span>Status</span><span>No data loaded yet</span>';$('dataNotes').innerHTML='';$('historyBody').innerHTML='';return}
+  const r=m.report||{},f=m.files||[],role={DASH:'DASH status',SEEG:'SEEG SOP',NEWMODEL:'New Model BOM'};
+  const kv=[['Refreshed',String(m.updated_at||'').replace('T',' ')],['BOM plan models',fmtN(r.bom_models)],['All models',fmtN(r.master_models)],
+    ['SOP versions',r.sop_versions?r.sop_versions.join(' → '):DASH],['SOP rows read',fmtN(r.sop_rows)],
+    ...f.map(x=>[role[x.role]||x.role,x.name+' · sheet “'+x.sheet+'” · '+(x.size/1048576).toFixed(1)+' MB']),
+    ['Rules','HQ = MP −'+RULES.hqWeeks+'W · LOCAL = MP −'+RULES.localWeeks+'W · SOP lead ≥ '+RULES.sopLeadWeeks+'W']];
+  $('dataInfo').innerHTML=kv.map(([k,v])=>'<span>'+esc(k)+'</span><span>'+esc(v)+'</span>').join('');
+  const w=m.warnings||[];
+  $('dataNotes').innerHTML=w.length?w.map(x=>'<li>'+esc(x)+'</li>').join(''):'<li class="none">No data-quality notes for the current data.</li>';
+  $('historyBody').innerHTML=(HISTORY||[]).slice().reverse().map(h=>'<tr><td>'+esc(String(h.updated_at).replace('T',' ').slice(0,16))+'</td><td>'+esc(h.sop_version??'')+'</td><td>'+h.models+'</td><td>'+h.on_time+' <span class="small">('+pct(h.on_time,h.models)+'%)</span></td><td>'+h.late+'</td><td>'+h.sop_issue+'</td><td>'+((h.added||0)+(h.removed||0)+(h.changed||0))+'</td></tr>').join('')||'<tr><td colspan="7" class="empty">No refreshes yet</td></tr>';
 }
 function show(tab){state.tab=tab;document.querySelectorAll('.slide').forEach(s=>s.classList.toggle('active',s.id===tab));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));renderAll()}
-function renderAll(){renderDashboard();renderBOM();renderMaster()}
-function downloadCSV(rows,keys,name){if(!rows.length){alert('No data to export.');return}const csv=[keys.join(','),...rows.map(r=>keys.map(k=>'"'+String(r[k]??'').replace(/^([=+@\t\r])/,"'$1").replace(/"/g,'""')+'"').join(','))].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function renderAll(){renderStatic();renderDashboard();renderBOM();renderMaster();renderDataInfo()}
+function fillSelect(id,values,numeric){
+  const sel=$(id),keep=sel.value;while(sel.options.length>1)sel.remove(1);
+  const vs=[...new Set(values.filter(v=>v!==''&&v!==null&&v!==undefined).map(String))];
+  vs.sort(numeric?(a,b)=>(parseFloat(a)-parseFloat(b))||a.localeCompare(b):undefined);
+  const frag=document.createDocumentFragment();vs.forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;frag.appendChild(o)});sel.appendChild(frag);
+  sel.value=vs.includes(keep)?keep:'';
+}
+function fillFilters(){fillSelect('globalProject',MASTER_DATA.map(x=>x.project).concat(BOM_DATA.map(x=>x.project)));fillSelect('globalInch',MASTER_DATA.map(x=>x.inch).concat(BOM_DATA.map(x=>x.inch)),true)}
 
+/* ------------------------------------------------------------------ CSV (Excel-friendly: UTF-8 BOM, formula injection neutralised) */
+function csvCell(v){let s=String(v??'');if(/^[=+@\t\r]/.test(s)||(/^-/.test(s)&&!/^-\d+(\.\d+)?$/.test(s)))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'}
+function downloadCSV(rows,cols,name){
+  if(!rows.length){toast('No data to export.',true);return}
+  const hdr=cols.map(c=>csvCell(c[1])).join(',');
+  const csv='\ufeff'+[hdr,...rows.map(r=>cols.map(c=>csvCell(typeof c[0]==='function'?c[0](r):r[c[0]])).join(','))].join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  const stamp=msIso(Date.now()).replace(/-/g,'');a.download=name.replace('.csv','_'+stamp+'.csv');a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+const CSV_COMMON=[['model','Model'],['project','Project'],['inch','Inch']];
+const CSV_TIMING=[['version','Latest SOP'],['firstSop','1st Appear in SOP'],[x=>der(x).g,'1st Appear -> 1st MP (weeks)'],[x=>der(x).sop?'YES':'','SOP issue'],
+  ['mp','1st MP'],['mpDate','1st MP date'],['mpFrom','MP source'],[x=>x.nmMpIso||'','New Model MP'],[x=>der(x).mm??'','MP diff vs New Model (weeks)'],
+  ['hqTarget','HQ target'],['localTarget','LOCAL target'],['bomHQ','BOM HQ'],['bomHQDate','BOM HQ date'],['bomLocal','BOM LOCAL'],['bomLocalDate','BOM LOCAL date'],
+  ['hqActual','HQ actual'],['localActual','LOCAL actual'],['hqStatus','HQ status'],['hqDelta','HQ delta (weeks)'],['localStatus','LOCAL status'],['localDelta','LOCAL delta (weeks)'],
+  [x=>PHASE[der(x).phase][0],'Progress'],[x=>der(x).pullLocal||der(x).pullHq?'MP pull-in':(der(x).late||der(x).hqLate?'BOM plan':''),'Delay cause']];
+
+/* ------------------------------------------------------------------ detail drawer */
+function openDrawer(x){
+  if(!x)return;const d=der(x),b=[];
+  const row=(k,v)=>'<dt>'+esc(k)+'</dt><dd>'+v+'</dd>';
+  const ex=[];
+  if(d.mp){ex.push('<p><b>1st MP</b> '+esc(x.mp)+' (from '+esc({ship:'SOP “Ship” plan',sop:'SOP “SOP” plan',newmodel:'New Model file'}[x.mpFrom]||'source')+').</p>');
+    ex.push('<p>Targets: HQ = MP − '+RULES.hqWeeks+'W = <b>'+esc(x.hqTarget)+'</b>; LOCAL = MP − '+RULES.localWeeks+'W = <b>'+esc(x.localTarget)+'</b>.</p>');}
+  else ex.push('<p>No MP week is known, so targets and status cannot be computed.</p>');
+  if(typeof x.localDelta==='number')ex.push('<p>LOCAL BOM '+esc(x.bomLocal)+' is '+(x.localDelta===0?'exactly on the target week':Math.abs(x.localDelta)+' week(s) '+(x.localDelta>0?'<b>after</b>':'before')+' target')+' → '+esc(x.localStatus)+'.</p>');
+  if(d.mm)ex.push('<p>The New Model file plans MP in <b>'+esc(wkLabel(isoMs(x.nmMpIso)))+'</b>; the SOP has it '+Math.abs(d.mm)+' week(s) '+(d.mm<0?'earlier':'later')+'.'+(d.pullLocal||d.pullHq?' The delay is caused entirely by this MP pull-in – the BOM plan itself matched the original MP.':'')+'</p>');
+  if(d.g!==null)ex.push('<p>First appeared in the SOP '+d.g+' week(s) before MP'+(d.sop?' – <b>less than the '+RULES.sopLeadWeeks+'-week lead time</b> (SOP issue).':'.')+'</p>');
+  if(x.hqAfterLocal)ex.push('<p><b>HQ BOM is planned after LOCAL BOM.</b></p>');
+  if(ix().changed.has(x.model)){const cs=CHANGES.filter(c=>c.model===x.model);ex.push('<p>Changed in the last refresh: '+cs.map(c=>c.kind==='changed'?esc(c.field)+' '+esc(c.old||DASH)+' → '+esc(c.new||DASH):esc(c.kind)).join('; ')+'.</p>')}
+  b.push('<div class="explain">'+ex.join('')+'</div><h4>Details</h4><dl>');
+  const fields=[['Project',x.project],['Project name',x.projectName],['Inch',x.inch],['Coverage',x.coverage],['Latest SOP',x.version?'Version '+x.version:''],['1st appear in SOP',x.firstSop],['1st appear → 1st MP',x.firstAppearMpGap],['1st MP',x.mp+(x.mpDate&&x.mpDate!==DASH?' · '+x.mpDate:'')],['New Model MP',x.nmMpIso?wkLabel(isoMs(x.nmMpIso))+' · '+x.nmMpIso:''],['HQ target',x.hqTarget],['LOCAL target',x.localTarget],['BOM HQ plan',x.bomHQ+(x.bomHQDate&&x.bomHQDate!==DASH?' · '+x.bomHQDate:'')],['BOM LOCAL plan',x.bomLocal+(x.bomLocalDate&&x.bomLocalDate!==DASH?' · '+x.bomLocalDate:'')],['HQ actual',x.hqActual],['LOCAL actual',x.localActual]];
+  for(const [k,v] of fields)if(v!==undefined)b.push(row(k,val(v)));
+  b.push(row('HQ status',badge(x.hqStatus,x.hqDelta)),row('LOCAL status',badge(x.localStatus,x.localDelta)),row('Progress',phaseCell(x)),'</dl>');
+  set('drawerTitle',x.model);set('drawerKicker',(x.project||'')+(x.inch?' · '+x.inch+'"':''));$('drawerBody').innerHTML=b.join('');
+  $('drawer').classList.add('open');$('drawerBg').classList.add('open');$('drawer').setAttribute('aria-hidden','false');
+}
+function closeDrawer(){$('drawer').classList.remove('open');$('drawerBg').classList.remove('open');$('drawer').setAttribute('aria-hidden','true')}
+function findModel(m){return BOM_DATA.find(x=>x.model===m)||MASTER_DATA.find(x=>x.model===m)}
+
+/* ------------------------------------------------------------------ events */
+function resetPages(){state.bomPage=1;state.masterPage=1}
+function goFilter(k){state.issueFilter=k;state.bomPage=1;show('bom')}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.tab)));
-document.getElementById('globalSearch').addEventListener('input',()=>{state.bomPage=1;state.masterPage=1;renderAll()});
-document.getElementById('globalProject').addEventListener('change',()=>{state.bomPage=1;state.masterPage=1;renderAll()});
-document.getElementById('resetBtn').addEventListener('click',()=>{document.getElementById('globalSearch').value='';document.getElementById('globalProject').value='';state.issueFilter='';state.bomPage=1;state.masterPage=1;renderAll()});
-document.getElementById('bomPrev').addEventListener('click',()=>{if(state.bomPage>1){state.bomPage--;renderBOM()}});
-document.getElementById('bomNext').addEventListener('click',()=>{if(state.bomPage<Math.ceil(filteredBOM().length/PAGE_SIZE)){state.bomPage++;renderBOM()}});
-document.getElementById('masterPrev').addEventListener('click',()=>{if(state.masterPage>1){state.masterPage--;renderMaster()}});
-document.getElementById('masterNext').addEventListener('click',()=>{if(state.masterPage<Math.ceil(filteredMaster().length/PAGE_SIZE)){state.masterPage++;renderMaster()}});
-document.getElementById('viewSopBtn').addEventListener('click',()=>{state.issueFilter='sop';state.bomPage=1;show('bom')});
-document.getElementById('viewHqBtn').addEventListener('click',()=>{state.issueFilter='hq';state.bomPage=1;show('bom')});
-document.getElementById('viewSeegBtn').addEventListener('click',()=>{state.issueFilter='seeg';state.bomPage=1;show('bom')});
-document.getElementById('exportBom').addEventListener('click',()=>downloadCSV(filteredBOM(),['model','project','inch','bomHQ','bomLocal','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','hqStatus','localStatus'],'BOM_Confirmation_Plan.csv'));
-document.getElementById('exportMaster').addEventListener('click',()=>downloadCSV(filteredMaster(),['model','project','inch','projectName','version','firstSop','firstAppearMpGap','mp','hqTarget','localTarget','bomHQ','bomLocal','hqStatus','localStatus','coverage'],'All_Models.csv'));
+$('globalSearch').addEventListener('input',()=>{resetPages();renderAll()});
+$('globalProject').addEventListener('change',()=>{resetPages();renderAll()});
+$('globalInch').addEventListener('change',()=>{resetPages();renderAll()});
+$('resetBtn').addEventListener('click',()=>{$('globalSearch').value='';$('globalProject').value='';$('globalInch').value='';state.issueFilter='';state.masterFilter='';state.bomSort=null;state.masterSort=null;resetPages();renderAll()});
+const pg=(k,fn)=>()=>{const n=Math.max(1,Math.ceil((k==='bom'?filteredBOM():filteredMaster()).length/pageSize()));const key=k+'Page';state[key]=fn(state[key],n);k==='bom'?renderBOM():renderMaster()};
+$('bomPrev').addEventListener('click',pg('bom',(p)=>Math.max(1,p-1)));$('bomNext').addEventListener('click',pg('bom',(p,n)=>Math.min(n,p+1)));
+$('bomFirst').addEventListener('click',pg('bom',()=>1));$('bomLast').addEventListener('click',pg('bom',(p,n)=>n));
+$('masterPrev').addEventListener('click',pg('master',(p)=>Math.max(1,p-1)));$('masterNext').addEventListener('click',pg('master',(p,n)=>Math.min(n,p+1)));
+$('masterFirst').addEventListener('click',pg('master',()=>1));$('masterLast').addEventListener('click',pg('master',(p,n)=>n));
+$('pageSize').addEventListener('change',e=>{state.pageSize=+e.target.value||PAGE_SIZE;resetPages();renderBOM();renderMaster()});
+$('viewSopBtn').addEventListener('click',()=>goFilter('sop'));
+$('viewHqBtn').addEventListener('click',()=>goFilter('hq'));
+$('viewSeegBtn').addEventListener('click',()=>goFilter('seeg'));
+$('viewChangedBtn').addEventListener('click',()=>goFilter('changed'));
+document.querySelectorAll('#dashboard .stat[data-filter]').forEach(s=>{s.style.cursor='pointer';s.addEventListener('click',()=>goFilter(s.dataset.filter))});
+$('checks').addEventListener('click',e=>{const b=e.target.closest('button[data-f]');if(b)goFilter(b.dataset.f)});
+$('timeline').addEventListener('click',e=>{const c=e.target.closest('.tl-col');if(c)goFilter('wk:'+c.dataset.iso+':'+c.dataset.to)});
+$('projBody').addEventListener('click',e=>{const r=e.target.closest('tr[data-p]');if(!r)return;const p=r.dataset.p,sel=$('globalProject');if([...sel.options].some(o=>o.value===p)){sel.value=sel.value===p?'':p;resetPages();renderAll()}});
+$('changes').addEventListener('click',e=>{const m=e.target.closest('.m');if(m)openDrawer(findModel(m.dataset.m))});
+$('bomChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b||b.disabled)return;const f=b.dataset.f;state.issueFilter=(state.issueFilter===f&&f)?'':f;state.bomPage=1;renderBOM();renderDashboard()});
+$('masterChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b||b.disabled)return;state.masterFilter=b.dataset.f;state.masterPage=1;renderMaster()});
+function sortClick(key,headId){$(headId).addEventListener('click',e=>{const th=e.target.closest('th[data-k]');if(!th)return;const k=th.dataset.k,s=state[key];
+  state[key]=!s||s.k!==k?{k,dir:1}:s.dir>0?{k,dir:-1}:null;key==='bomSort'?(state.bomPage=1,renderBOM()):(state.masterPage=1,renderMaster())})}
+sortClick('bomSort','bomHead');sortClick('masterSort','masterHead');
+$('bomBody').addEventListener('click',e=>{const r=e.target.closest('tr[data-i]');if(r&&renderBOM.rows)openDrawer(renderBOM.rows[+r.dataset.i])});
+$('masterBody').addEventListener('click',e=>{const r=e.target.closest('tr[data-i]');if(r&&renderMaster.rows)openDrawer(renderMaster.rows[+r.dataset.i])});
+$('drawerClose').addEventListener('click',closeDrawer);$('drawerBg').addEventListener('click',closeDrawer);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+$('exportBom').addEventListener('click',()=>downloadCSV(filteredBOM(),CSV_COMMON.concat(CSV_TIMING),'BOM_Confirmation_Plan.csv'));
+$('exportMaster').addEventListener('click',()=>downloadCSV(filteredMaster(),CSV_COMMON.concat([['projectName','Project Name'],['coverage','Coverage']],CSV_TIMING),'All_Models.csv'));
 
-[...new Set(MASTER_DATA.map(x=>x.project).filter(Boolean))].sort().forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;document.getElementById('globalProject').appendChild(o)});
+fillFilters();
 renderAll();
 </script>
 
 <script>
-/* === SYSTEM UPDATE ENGINE V2 · local Excel-COM pipeline === */
+/* === SYSTEM UPDATE ENGINE V3 · local Excel-COM pipeline === */
 (function(){
   const $=id=>document.getElementById(id);
   const served=/^https?:$/.test(location.protocol);
@@ -487,15 +870,14 @@ renderAll();
     if(!r.ok)throw new Error((j&&j.error)||('request failed ('+r.status+')'));
     return j;
   }
-  // Replace every dataset the dashboard reads from and re-render (charts, KPIs, tables, project filter).
+  // Replace every dataset the dashboard reads from and re-render (charts, KPIs, tables, filters).
   function applyData(d){
     if(!d||!Array.isArray(d.bom)||!Array.isArray(d.master))throw new Error('the service returned data in an unexpected format');
     BOM_DATA=d.bom;
     MASTER_DATA.splice(0,MASTER_DATA.length,...d.master);
-    const sel=$('globalProject'),keep=sel.value;
-    while(sel.options.length>1)sel.remove(1);
-    [...new Set(MASTER_DATA.map(x=>x.project).filter(Boolean))].sort().forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o)});
-    sel.value=[...sel.options].some(o=>o.value===keep)?keep:'';
+    META=d.meta||null;HISTORY=d.history||[];CHANGES=d.changes||[];
+    if(META&&META.rules)RULES=Object.assign({},RULES,META.rules);
+    fillFilters();
     state.issueFilter='';state.bomPage=1;state.masterPage=1;
     lastUpdated=(d.meta&&d.meta.updated_at)||lastUpdated;
     renderAll();
@@ -511,11 +893,11 @@ renderAll();
       if(attached===0&&served){
         try{fromInbox=!!(await api('/api/status')).inboxReady}catch(e){}
       }
-      if(!fromInbox){setStatus('Attach all 3 source files first');return}
+      if(!fromInbox){setStatus('Attach all 3 source files first');toast('Attach all 3 source files first (or put them in the inbox folder).',true);return}
     }
     if(!served){
       const m='the local data service is not running. Start it with start_dashboard.bat and use the page it opens.';
-      setStatus('Update failed · '+m);alert('Update failed: '+m);return;
+      setStatus('Update failed · '+m);toast('Update failed: '+m,true);return;
     }
     const btn=$('updateDataBtn');btn.disabled=true;busy=true;
     try{
@@ -541,11 +923,11 @@ renderAll();
       }
       const d=await api('/api/data');
       applyData(d);
-      setStatus(`Updated successfully · ${BOM_DATA.length} BOM models · ${MASTER_DATA.length} total models`);
-      const w=(d.meta&&d.meta.warnings)||[];
-      alert(`Data updated successfully.\n\nBOM Plan: ${BOM_DATA.length} models\nAll Models: ${MASTER_DATA.length} models`+(w.length?'\n\nNotes:\n- '+w.join('\n- '):''));
+      const w=(d.meta&&d.meta.warnings)||[], c=new Set((d.changes||[]).map(x=>x.model)).size;
+      setStatus(`Updated successfully · ${BOM_DATA.length} BOM models · ${MASTER_DATA.length} total models`+(c?` · ${c} changed`:'')+(w.length?` · ${w.length} note(s) below`:''));
+      toast('Data updated: '+BOM_DATA.length+' BOM models, '+MASTER_DATA.length+' total'+(w.length?' – see notes on the Update Data page':''));
     }catch(e){
-      console.error(e);setStatus('Update failed · '+e.message);alert('Update failed: '+e.message);
+      console.error(e);setStatus('Update failed · '+e.message);toast('Update failed: '+e.message,true);
     }finally{btn.disabled=false;busy=false}
   }
   [1,2,3].forEach(i=>{
